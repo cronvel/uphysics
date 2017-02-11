@@ -1,6 +1,6 @@
 {
   "name": "uphysics",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Unrealistic physic engine.",
   "main": "lib/physic.js",
   "engines": {
