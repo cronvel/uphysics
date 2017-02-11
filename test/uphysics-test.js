@@ -52,6 +52,20 @@ function expectCirca( value , circa )
 
 
 
+describe( "Shape discrete collisions" , function() {
+	it( "dot against box" ) ;
+	it( "dot against sphere" ) ;
+	it( "dot against infinite cylinder" ) ;
+	it( "dot against cylinder" ) ;
+	it( "dot against octahedron" ) ;
+	it( "sphere against box" ) ;
+	it( "sphere against sphere" ) ;
+	it( "sphere against cylinder" ) ;
+	it( "cylinder against cylinder" ) ;
+} ) ;
+
+
+
 describe( "Shape continuous collisions" , function() {
 	
 	it( "dot against box" , function() {
@@ -179,7 +193,67 @@ describe( "Shape continuous collisions" , function() {
 		expectCirca( collision.normal.z , 0 ) ;
 	} ) ;
 	
-	it( "dot against cylinder" ) ;
+	it( "dot against cylinder" , function() {
+		var collision ;
+		var dotShape = physic.Shape.Dot.create() ;
+		var dotOldPos = physic.Vector3D( 5 , 0 , 0 ) ;
+		var dotPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		var cylinderShape = physic.Shape.Cylinder.create( { x: 0, y: 0, z: 1 } , 2 , 4 ) ;
+		var cylinderOldPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		var cylinderPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		
+		collision = dotShape.getContinuousCollision( dotOldPos , dotPos , cylinderShape , cylinderOldPos , cylinderPos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 0.6 ) ;
+		expect( collision.displacement ).to.eql( { x: 2, y: 0, z: 0 } ) ;
+		expect( collision.normal ).to.eql( { x: 1, y: 0, z: 0 } ) ;
+		
+		collision = cylinderShape.getContinuousCollision( cylinderOldPos , cylinderPos , dotShape , dotOldPos , dotPos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 0.6 ) ;
+		expect( collision.displacement ).to.eql( { x: -2, y: 0, z: 0 } ) ;
+		expect( collision.normal ).to.eql( { x: -1, y: 0, z: 0 } ) ;
+		
+		dotOldPos = physic.Vector3D( 5 , 1 , 0 ) ;
+		dotPos = physic.Vector3D( 0 , 1 , 0 ) ;
+		collision = dotShape.getContinuousCollision( dotOldPos , dotPos , cylinderShape , cylinderOldPos , cylinderPos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 0.6535898384862244 ) ;
+		expectCirca( collision.displacement.x , Math.sqrt( 3 ) ) ;
+		expectCirca( collision.displacement.y , 0 ) ;
+		expectCirca( collision.displacement.z , 0 ) ;
+		expectCirca( collision.normal.x , Math.sqrt( 3 ) / 2 ) ;
+		expectCirca( collision.normal.y , 0.5 ) ;
+		expectCirca( collision.normal.z , 0 ) ;
+		
+		dotOldPos = physic.Vector3D( 5 , 1 , 1 ) ;
+		dotPos = physic.Vector3D( 0 , 1 , 1 ) ;
+		collision = dotShape.getContinuousCollision( dotOldPos , dotPos , cylinderShape , cylinderOldPos , cylinderPos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 0.6535898384862244 ) ;
+		expectCirca( collision.displacement.x , Math.sqrt( 3 ) ) ;
+		expectCirca( collision.displacement.y , 0 ) ;
+		expectCirca( collision.displacement.z , 0 ) ;
+		expectCirca( collision.normal.x , Math.sqrt( 3 ) / 2 ) ;
+		expectCirca( collision.normal.y , 0.5 ) ;
+		expectCirca( collision.normal.z , 0 ) ;
+		
+		// over the cylinder, no collision
+		dotOldPos = physic.Vector3D( 5 , 1 , 3 ) ;
+		dotPos = physic.Vector3D( 0 , 1 , 3 ) ;
+		collision = dotShape.getContinuousCollision( dotOldPos , dotPos , cylinderShape , cylinderOldPos , cylinderPos ) ;
+		//console.log( collision ) ;
+		expect( collision ).to.be( null ) ;
+		
+		dotOldPos = physic.Vector3D( 0 , 0 , 5 ) ;
+		dotPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		collision = dotShape.getContinuousCollision( dotOldPos , dotPos , cylinderShape , cylinderOldPos , cylinderPos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 0.6 ) ;
+		expect( collision.displacement ).to.eql( { x: 0, y: 0, z: 2 } ) ;
+		expect( collision.normal ).to.eql( { x: 0, y: 0, z: 1 } ) ;
+	} ) ;
+	
 	it( "dot against octahedron" ) ;
 	it( "sphere against box" ) ;
 	it( "sphere against sphere" ) ;
@@ -187,17 +261,4 @@ describe( "Shape continuous collisions" , function() {
 	it( "cylinder against cylinder" ) ;
 } ) ;
 	
-
-
-describe( "Shape discrete collisions" , function() {
-	it( "dot against box" ) ;
-	it( "dot against sphere" ) ;
-	it( "dot against infinite cylinder" ) ;
-	it( "dot against cylinder" ) ;
-	it( "dot against octahedron" ) ;
-	it( "sphere against box" ) ;
-	it( "sphere against sphere" ) ;
-	it( "sphere against cylinder" ) ;
-	it( "cylinder against cylinder" ) ;
-} ) ;
 
