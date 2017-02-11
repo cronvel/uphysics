@@ -255,10 +255,182 @@ describe( "Shape continuous collisions" , function() {
 	} ) ;
 	
 	it( "dot against octahedron" ) ;
-	it( "sphere against box" ) ;
-	it( "sphere against sphere" ) ;
-	it( "sphere against cylinder" ) ;
-	it( "cylinder against cylinder" ) ;
+	
+	it( "sphere against box" , function() {
+		var collision ;
+		var sphereShape = physic.Shape.Sphere.create( 1 ) ;
+		var sphereOldPos = physic.Vector3D( 5 , 0 , 0 ) ;
+		var spherePos = physic.Vector3D( 0 , 0 , 0 ) ;
+		var boxShape = physic.Shape.Box.create( 3 , 4 , 5 ) ;
+		var boxOldPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		var boxPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		
+		collision = sphereShape.getContinuousCollision( sphereOldPos , spherePos , boxShape , boxOldPos , boxPos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 0.5 ) ;
+		expect( collision.displacement ).to.eql( { x: 2.5, y: 0, z: 0 } ) ;
+		expect( collision.normal ).to.eql( { x: 1, y: 0, z: 0 } ) ;
+		
+		sphereOldPos = physic.Vector3D( 5 , 1 , 0 ) ;
+		spherePos = physic.Vector3D( 0 , 1 , 0 ) ;
+		collision = sphereShape.getContinuousCollision( sphereOldPos , spherePos , boxShape , boxOldPos , boxPos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 0.5 ) ;
+		expect( collision.displacement ).to.eql( { x: 2.5, y: 0, z: 0 } ) ;
+		expect( collision.normal ).to.eql( { x: 1, y: 0, z: 0 } ) ;
+		
+		sphereOldPos = physic.Vector3D( 5 , 1 , 1 ) ;
+		spherePos = physic.Vector3D( 0 , 1 , 1 ) ;
+		collision = sphereShape.getContinuousCollision( sphereOldPos , spherePos , boxShape , boxOldPos , boxPos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 0.5 ) ;
+		expect( collision.displacement ).to.eql( { x: 2.5, y: 0, z: 0 } ) ;
+		expect( collision.normal ).to.eql( { x: 1, y: 0, z: 0 } ) ;
+	} ) ;
+	
+	it.next( "sphere against box: edge collision" , function() {
+		var collision ;
+		var sphereShape = physic.Shape.Sphere.create( 1 ) ;
+		var sphereOldPos = physic.Vector3D( 5 , 0 , 0 ) ;
+		var spherePos = physic.Vector3D( 0 , 0 , 0 ) ;
+		var boxShape = physic.Shape.Box.create( 3 , 4 , 5 ) ;
+		var boxOldPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		var boxPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		
+		sphereOldPos = physic.Vector3D( 5 , 1 , 3 ) ;
+		spherePos = physic.Vector3D( 0 , 1 , 3 ) ;
+		collision = sphereShape.getContinuousCollision( sphereOldPos , spherePos , boxShape , boxOldPos , boxPos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 0.7 ) ;
+		expect( collision.displacement ).to.eql( { x: 1.5, y: 0, z: 0 } ) ;
+		expect( collision.normal ).to.eql( { x: Math.SQRT1_2, y: 0, z: Math.SQRT1_2 } ) ;
+	} ) ;
+	
+	it( "sphere against sphere" , function() {
+		var collision ;
+		var movingSphereShape = physic.Shape.Sphere.create( 1 ) ;
+		var movingSphereOldPos = physic.Vector3D( 5 , 0 , 0 ) ;
+		var movingSpherePos = physic.Vector3D( 0 , 0 , 0 ) ;
+		var sphereShape = physic.Shape.Sphere.create( 2 ) ;
+		var sphereOldPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		var spherePos = physic.Vector3D( 0 , 0 , 0 ) ;
+		
+		collision = movingSphereShape.getContinuousCollision( movingSphereOldPos , movingSpherePos , sphereShape , sphereOldPos , spherePos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 0.4 ) ;
+		expect( collision.displacement ).to.eql( { x: 3, y: 0, z: 0 } ) ;
+		expect( collision.normal ).to.eql( { x: 1, y: 0, z: 0 } ) ;
+		
+		movingSphereOldPos = physic.Vector3D( 5 , 1 , 0 ) ;
+		movingSpherePos = physic.Vector3D( 0 , 1 , 0 ) ;
+		collision = movingSphereShape.getContinuousCollision( movingSphereOldPos , movingSpherePos , sphereShape , sphereOldPos , spherePos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 0.4343145750507619 ) ;
+		expectCirca( collision.displacement.x , 2.8284271247461907 ) ;
+		expectCirca( collision.displacement.y , 0 ) ;
+		expectCirca( collision.displacement.z , 0 ) ;
+		expectCirca( collision.normal.x , 0.9428090415820634 ) ;
+		expectCirca( collision.normal.y , 1/3 ) ;
+		expectCirca( collision.normal.z , 0 ) ;
+		
+		movingSphereOldPos = physic.Vector3D( 5 , 1 , 1 ) ;
+		movingSpherePos = physic.Vector3D( 0 , 1 , 1 ) ;
+		collision = movingSphereShape.getContinuousCollision( movingSphereOldPos , movingSpherePos , sphereShape , sphereOldPos , spherePos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 0.4708497377870816 ) ;
+		expectCirca( collision.displacement.x , 2.645751311064592 ) ;
+		expectCirca( collision.displacement.y , 0 ) ;
+		expectCirca( collision.displacement.z , 0 ) ;
+		expectCirca( collision.normal.x , 0.881917103688197 ) ;
+		expectCirca( collision.normal.y , 1/3 ) ;
+		expectCirca( collision.normal.z , 1/3 ) ;
+	} ) ;
+	
+	it( "sphere against cylinder" , function() {
+		var collision ;
+		var sphereShape = physic.Shape.Sphere.create( 1 ) ;
+		var sphereOldPos = physic.Vector3D( 5 , 0 , 0 ) ;
+		var spherePos = physic.Vector3D( 0 , 0 , 0 ) ;
+		var cylinderShape = physic.Shape.Cylinder.create( { x: 0, y: 0, z: 1 } , 2 , 4 ) ;
+		var cylinderOldPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		var cylinderPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		
+		collision = sphereShape.getContinuousCollision( sphereOldPos , spherePos , cylinderShape , cylinderOldPos , cylinderPos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 0.4 ) ;
+		expect( collision.displacement ).to.eql( { x: 3, y: 0, z: 0 } ) ;
+		expect( collision.normal ).to.eql( { x: 1, y: 0, z: 0 } ) ;
+		
+		sphereOldPos = physic.Vector3D( 5 , 1 , 0 ) ;
+		spherePos = physic.Vector3D( 0 , 1 , 0 ) ;
+		collision = sphereShape.getContinuousCollision( sphereOldPos , spherePos , cylinderShape , cylinderOldPos , cylinderPos ) ;
+		//console.log( collision ) ;
+		expectCirca( collision.t , 0.4343145750507619 ) ;
+		expectCirca( collision.displacement.x , 2.8284271247461907 ) ;
+		expectCirca( collision.displacement.y , 0 ) ;
+		expectCirca( collision.displacement.z , 0 ) ;
+		expectCirca( collision.normal.x , 0.9428090415820634 ) ;
+		expectCirca( collision.normal.y , 1/3 ) ;
+		expectCirca( collision.normal.z , 0 ) ;
+		
+		sphereOldPos = physic.Vector3D( 5 , 1 , 1 ) ;
+		spherePos = physic.Vector3D( 0 , 1 , 1 ) ;
+		collision = sphereShape.getContinuousCollision( sphereOldPos , spherePos , cylinderShape , cylinderOldPos , cylinderPos ) ;
+		//console.log( collision ) ;
+		expectCirca( collision.t , 0.4343145750507619 ) ;
+		expectCirca( collision.displacement.x , 2.8284271247461903 ) ;
+		expectCirca( collision.displacement.y , 0 ) ;
+		expectCirca( collision.displacement.z , 0 ) ;
+		expectCirca( collision.normal.x , 0.9428090415820635 ) ;
+		expectCirca( collision.normal.y , 1/3 ) ;
+		expectCirca( collision.normal.z , 0 ) ;
+	} ) ;
+	
+	it( "cylinder against cylinder" , function() {
+		var collision ;
+		var movingCylinderShape = physic.Shape.Cylinder.create( { x: 0, y: 0, z: 1 } , 1 , 4 ) ;
+		var movingCylinderOldPos = physic.Vector3D( 5 , 0 , 0 ) ;
+		var movingCylinderPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		var cylinderShape = physic.Shape.Cylinder.create( { x: 0, y: 0, z: 1 } , 2 , 4 ) ;
+		var cylinderOldPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		var cylinderPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		
+		collision = movingCylinderShape.getContinuousCollision( movingCylinderOldPos , movingCylinderPos , cylinderShape , cylinderOldPos , cylinderPos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 0.4 ) ;
+		expect( collision.displacement ).to.eql( { x: 3, y: 0, z: 0 } ) ;
+		expect( collision.normal ).to.eql( { x: 1, y: 0, z: 0 } ) ;
+		
+		movingCylinderOldPos = physic.Vector3D( 5 , 1 , 0 ) ;
+		movingCylinderPos = physic.Vector3D( 0 , 1 , 0 ) ;
+		collision = movingCylinderShape.getContinuousCollision( movingCylinderOldPos , movingCylinderPos , cylinderShape , cylinderOldPos , cylinderPos ) ;
+		//console.log( collision ) ;
+		expectCirca( collision.t , 0.4343145750507619 ) ;
+		expectCirca( collision.displacement.x , 2.8284271247461907 ) ;
+		expectCirca( collision.displacement.y , 0 ) ;
+		expectCirca( collision.displacement.z , 0 ) ;
+		expectCirca( collision.normal.x , 0.9428090415820634 ) ;
+		expectCirca( collision.normal.y , 1/3 ) ;
+		expectCirca( collision.normal.z , 0 ) ;
+		
+		movingCylinderOldPos = physic.Vector3D( 5 , 1 , 1 ) ;
+		movingCylinderPos = physic.Vector3D( 0 , 1 , 1 ) ;
+		collision = movingCylinderShape.getContinuousCollision( movingCylinderOldPos , movingCylinderPos , cylinderShape , cylinderOldPos , cylinderPos ) ;
+		//console.log( collision ) ;
+		expectCirca( collision.t , 0.4343145750507619 ) ;
+		expectCirca( collision.displacement.x , 2.8284271247461903 ) ;
+		expectCirca( collision.displacement.y , 0 ) ;
+		expectCirca( collision.displacement.z , 0 ) ;
+		expectCirca( collision.normal.x , 0.9428090415820635 ) ;
+		expectCirca( collision.normal.y , 1/3 ) ;
+		expectCirca( collision.normal.z , 0 ) ;
+		
+		movingCylinderOldPos = physic.Vector3D( 5 , 1 , 4.01 ) ;
+		movingCylinderPos = physic.Vector3D( 0 , 1 , 4.01 ) ;
+		collision = movingCylinderShape.getContinuousCollision( movingCylinderOldPos , movingCylinderPos , cylinderShape , cylinderOldPos , cylinderPos ) ;
+		//console.log( collision ) ;
+		expect( collision ).to.be( null ) ;
+	} ) ;
 } ) ;
 	
 
