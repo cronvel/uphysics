@@ -118,7 +118,7 @@ describe( "Shape discrete collisions" , function() {
 		expectCirca( collision.normal.z , 1 / Math.sqrt( 3 ) ) ;
 	} ) ;
 	
-	it( "zzz dot against infinite cylinder" , function() {
+	it( "dot against infinite cylinder" , function() {
 		var collision ;
 		var dotShape = physic.Shape.createDot() ;
 		var dotPos = physic.Vector3D( 0.5 , 0 , 0 ) ;
@@ -161,7 +161,54 @@ describe( "Shape discrete collisions" , function() {
 		expectCirca( collision.normal.z , 0 ) ;
 	} ) ;
 	
-	it( "dot against cylinder" ) ;
+	it( "dot against cylinder" , function() {
+		var collision ;
+		var dotShape = physic.Shape.createDot() ;
+		var dotPos = physic.Vector3D( 0.5 , 0 , 0 ) ;
+		var cylinderShape = physic.Shape.createCylinder( { x: 0, y: 0, z: 1 } , 2 , 4 ) ;
+		var cylinderPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		
+		collision = dotShape.getCollision( dotPos , cylinderShape , cylinderPos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 1 ) ;
+		expect( collision.displacement ).to.eql( { x: 1.5, y: 0, z: 0 } ) ;
+		expect( collision.normal ).to.eql( { x: 1, y: 0, z: 0 } ) ;
+		
+		dotPos = physic.Vector3D( 0 , 1 , 0 ) ;
+		collision = dotShape.getCollision( dotPos , cylinderShape , cylinderPos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 1 ) ;
+		expect( collision.displacement ).to.eql( { x: 0, y: 1, z: 0 } ) ;
+		expect( collision.normal ).to.eql( { x: 0, y: 1, z: 0 } ) ;
+		
+		dotPos = physic.Vector3D( 1 , 1 , 0 ) ;
+		collision = dotShape.getCollision( dotPos , cylinderShape , cylinderPos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 1 ) ;
+		expectCirca( collision.displacement.x , Math.SQRT2 - 1 ) ;
+		expectCirca( collision.displacement.y , Math.SQRT2 - 1 ) ;
+		expectCirca( collision.displacement.z , 0 ) ;
+		expectCirca( collision.normal.x , Math.SQRT1_2 ) ;
+		expectCirca( collision.normal.y , Math.SQRT1_2 ) ;
+		expectCirca( collision.normal.z , 0 ) ;
+		
+		dotPos = physic.Vector3D( 1 , 1 , 1 ) ;
+		collision = dotShape.getCollision( dotPos , cylinderShape , cylinderPos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 1 ) ;
+		expectCirca( collision.displacement.x , Math.SQRT2 - 1 ) ;
+		expectCirca( collision.displacement.y , Math.SQRT2 - 1 ) ;
+		expectCirca( collision.displacement.z , 0 ) ;
+		expectCirca( collision.normal.x , Math.SQRT1_2 ) ;
+		expectCirca( collision.normal.y , Math.SQRT1_2 ) ;
+		expectCirca( collision.normal.z , 0 ) ;
+		
+		dotPos = physic.Vector3D( 1 , 1 , 2.01 ) ;
+		collision = dotShape.getCollision( dotPos , cylinderShape , cylinderPos ) ;
+		//console.log( collision ) ;
+		expect( collision ).to.be( null ) ;
+	} ) ;
+	
 	it( "dot against octahedron" ) ;
 	it( "sphere against box" ) ;
 	it( "sphere against sphere" ) ;
