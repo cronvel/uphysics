@@ -210,8 +210,90 @@ describe( "Shape discrete collisions" , function() {
 	} ) ;
 	
 	it( "dot against octahedron" ) ;
-	it( "sphere against box" ) ;
-	it( "sphere against sphere" ) ;
+	
+	it.next( "sphere against box -- bug: each dynamic vertex should only be tested against the relevant surface" , function() {
+		var collision ;
+		var sphereShape = physic.Shape.createSphere( 1 ) ;
+		var spherePos = physic.Vector3D( 1 , 0 , 0 ) ;
+		var boxShape = physic.Shape.createBox( 3 , 4 , 5 ) ;
+		var boxPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		
+		/*
+		collision = sphereShape.getCollision( spherePos , boxShape , boxPos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 1 ) ;
+		expect( collision.displacement ).to.eql( { x: 1.5, y: 0, z: 0 } ) ;
+		expect( collision.normal ).to.eql( { x: 1, y: 0, z: 0 } ) ;
+		//*/
+		
+		spherePos = physic.Vector3D( 0.1 , 0 , 0 ) ;
+		collision = sphereShape.getCollision( spherePos , boxShape , boxPos ) ;
+		console.log( collision ) ;
+		expect( collision.t ).to.be( 1 ) ;
+		expect( collision.displacement ).to.eql( { x: 0, y: 2.6, z: 0 } ) ;
+		expect( collision.normal ).to.eql( { x: 0, y: 1, z: 0 } ) ;
+		
+		/*
+		spherePos = physic.Vector3D( 1 , 1 , 1 ) ;
+		collision = sphereShape.getCollision( spherePos , boxShape , boxPos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 1 ) ;
+		expect( collision.displacement ).to.eql( { x: 2.5, y: 0, z: 0 } ) ;
+		expect( collision.normal ).to.eql( { x: 1, y: 0, z: 0 } ) ;
+		//*/
+	} ) ;
+	
+	it.next( "sphere against box: edge collision" , function() {
+		var collision ;
+		var sphereShape = physic.Shape.createSphere( 1 ) ;
+		var spherePos = physic.Vector3D( 0 , 0 , 0 ) ;
+		var boxShape = physic.Shape.createBox( 3 , 4 , 5 ) ;
+		var boxPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		
+		spherePos = physic.Vector3D( 0 , 1 , 3 ) ;
+		collision = sphereShape.getCollision( spherePos , boxShape , boxPos ) ;
+		//console.log( collision ) ;
+		//expect( collision.t ).to.be( 0.7 ) ;
+		//expect( collision.displacement ).to.eql( { x: 1.5, y: 0, z: 0 } ) ;
+		expect( collision.normal ).to.eql( { x: Math.SQRT1_2, y: 0, z: Math.SQRT1_2 } ) ;
+	} ) ;
+	
+	it( "sphere against sphere" , function() {
+		var collision ;
+		var movingSphereShape = physic.Shape.createSphere( 1 ) ;
+		var movingSpherePos = physic.Vector3D( 1 , 0 , 0 ) ;
+		var sphereShape = physic.Shape.createSphere( 2 ) ;
+		var spherePos = physic.Vector3D( 0 , 0 , 0 ) ;
+		
+		collision = movingSphereShape.getCollision( movingSpherePos , sphereShape , spherePos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 1 ) ;
+		expect( collision.displacement ).to.eql( { x: 2, y: 0, z: 0 } ) ;
+		expect( collision.normal ).to.eql( { x: 1, y: 0, z: 0 } ) ;
+		
+		movingSpherePos = physic.Vector3D( 1 , 1 , 0 ) ;
+		collision = movingSphereShape.getCollision( movingSpherePos , sphereShape , spherePos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 1 ) ;
+		expectCirca( collision.displacement.x , 1.1213203435596424 ) ;
+		expectCirca( collision.displacement.y , 1.1213203435596424 ) ;
+		expectCirca( collision.displacement.z , 0 ) ;
+		expectCirca( collision.normal.x , Math.SQRT1_2 ) ;
+		expectCirca( collision.normal.y , Math.SQRT1_2 ) ;
+		expectCirca( collision.normal.z , 0 ) ;
+		
+		movingSpherePos = physic.Vector3D( 1 , 1 , 1 ) ;
+		collision = movingSphereShape.getCollision( movingSpherePos , sphereShape , spherePos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 1 ) ;
+		expectCirca( collision.displacement.x , 0.7320508075688774 ) ;
+		expectCirca( collision.displacement.y , 0.7320508075688774 ) ;
+		expectCirca( collision.displacement.z , 0.7320508075688774 ) ;
+		expectCirca( collision.normal.x , 0.5773502691896258 ) ;
+		expectCirca( collision.normal.y , 0.5773502691896258 ) ;
+		expectCirca( collision.normal.z , 0.5773502691896258 ) ;
+	} ) ;
+	
 	it( "sphere against cylinder" ) ;
 	it( "cylinder against cylinder" ) ;
 } ) ;

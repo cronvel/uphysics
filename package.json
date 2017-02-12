@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "array-kit": "^0.1.3",
-    "logfella": "^0.3.48",
+    "logfella": "^0.3.49",
     "math-kit": "^0.11.5"
   },
   "devDependencies": {
