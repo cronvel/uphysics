@@ -668,3 +668,60 @@ describe( "Shape continuous collisions" , function() {
 } ) ;
 	
 
+
+describe( "Controllers" , function() {
+	
+	it( "TopSpeedLimit controller" , function() {
+		var topSpeedLimiter = physic.dynamics.TopSpeedLimitController.create( {
+			maxAcceleration: 6 ,
+			topSpeed: 8 ,
+			topSpeedViolationBrake: 10 ,
+		} ) ;
+		
+		var entity = physic.Entity.create( {
+			dynamics: [ topSpeedLimiter ]
+		} ) ;
+		
+		// Accel at 0 speed should be 6
+		entity.controllerData.speedVector = physic.Vector3D( 8 , 0 , 0 ) ;
+		topSpeedLimiter.apply( entity , 0.1 ) ;
+		//console.log( entity ) ;
+		expectCirca( entity.boundVector.vector.x , 0.6 ) ;
+		
+		// Accel at half of top-speed should be 3
+		entity.boundVector.vector.x = 4 ;
+		topSpeedLimiter.apply( entity , 0.1 ) ;
+		//console.log( entity ) ;
+		expectCirca( entity.boundVector.vector.x , 4.3 ) ;
+		
+		// Accel at 3/4 of top-speed should be 1.5
+		entity.boundVector.vector.x = 6 ;
+		topSpeedLimiter.apply( entity , 0.1 ) ;
+		//console.log( entity ) ;
+		expectCirca( entity.boundVector.vector.x , 6.15 ) ;
+		
+		// Accel at top-speed should be 0
+		entity.boundVector.vector.x = 8 ;
+		topSpeedLimiter.apply( entity , 0.1 ) ;
+		//console.log( entity ) ;
+		expectCirca( entity.boundVector.vector.x , 8 ) ;
+		
+		// Accel at top-speed violation should be negative: -10
+		entity.boundVector.vector.x = 16 ;
+		topSpeedLimiter.apply( entity , 0.1 ) ;
+		//console.log( entity ) ;
+		expectCirca( entity.boundVector.vector.x , 15 ) ;
+		
+		// Accel when breaking from half of top-speed should be negative: 9
+		entity.boundVector.vector.x = -4 ;
+		topSpeedLimiter.apply( entity , 0.1 ) ;
+		//console.log( entity ) ;
+		expectCirca( entity.boundVector.vector.x , -3.1 ) ;
+		
+		// Accel when breaking from top-speed should be negative: 12
+		entity.boundVector.vector.x = -8 ;
+		topSpeedLimiter.apply( entity , 0.1 ) ;
+		//console.log( entity ) ;
+		expectCirca( entity.boundVector.vector.x , -6.8 ) ;
+	} ) ;
+} ) ;
