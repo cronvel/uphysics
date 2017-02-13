@@ -683,7 +683,7 @@ describe( "Controllers" , function() {
 		} ) ;
 		
 		// Accel at 0 speed should be 6
-		entity.controllerData.speedVector = physic.Vector3D( 8 , 0 , 0 ) ;
+		entity.input.speedVector = physic.Vector3D( 8 , 0 , 0 ) ;
 		topSpeedLimiter.apply( entity , 0.1 ) ;
 		//console.log( entity ) ;
 		expectCirca( entity.boundVector.vector.x , 0.6 ) ;
