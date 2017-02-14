@@ -728,7 +728,13 @@ describe( "Controllers" , function() {
 	it( "Motor controller" , function() {
 		
 		var torqueFn = physic.Fn.create( [
-			{ x: 0 } ,
+			{ x: 0 , fx: 30 } ,
+			{ x: 1000 , fx: 100 } ,
+			{ x: 4000 , fx: 200 } ,
+			{ x: 6000 , fx: 300 } ,
+			{ x: 6500 , fx: 350 } ,
+			{ x: 7000 , fx: 300 } ,
+			{ x: 9000 , fx: 250 } ,
 		] , {
 			preserveExtrema: true ,
 			atanMeanSlope: true
