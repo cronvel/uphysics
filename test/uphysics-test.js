@@ -724,4 +724,30 @@ describe( "Controllers" , function() {
 		//console.log( entity ) ;
 		expectCirca( entity.boundVector.vector.x , -6.8 ) ;
 	} ) ;
+	
+	it( "Motor controller" , function() {
+		
+		var torqueFn = physic.Fn.create( [
+			{ x: 0 } ,
+		] , {
+			preserveExtrema: true ,
+			atanMeanSlope: true
+		} ) ;
+		
+		torqueFn = torqueFn.fx.bind( torqueFn ) ;
+		
+		var motor = physic.dynamics.TopSpeedLimitController.create( {
+			torqueFn: torqueFn
+		} ) ;
+		
+		var entity = physic.Entity.create( {
+			dynamics: [ topSpeedLimiter ]
+		} ) ;
+		
+		// Accel at 0 speed should be 6
+		entity.input.speedVector = physic.Vector3D( 8 , 0 , 0 ) ;
+		topSpeedLimiter.apply( entity , 0.1 ) ;
+		//console.log( entity ) ;
+		expectCirca( entity.boundVector.vector.x , 0.6 ) ;
+	} ) ;
 } ) ;
