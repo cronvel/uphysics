@@ -725,7 +725,7 @@ describe( "Controllers" , function() {
 		expectCirca( entity.boundVector.vector.x , -6.8 ) ;
 	} ) ;
 	
-	it( "Motor controller" , function() {
+	it( "Motor controller (wip)" , function() {
 		
 		var torqueFn = physic.Fn.create( [
 			{ x: 0 , fx: 30 } ,
@@ -734,7 +734,7 @@ describe( "Controllers" , function() {
 			{ x: 6000 , fx: 300 } ,
 			{ x: 6500 , fx: 350 } ,
 			{ x: 7000 , fx: 300 } ,
-			{ x: 9000 , fx: 250 } ,
+			{ x: 8000 , fx: 250 } ,
 		] , {
 			preserveExtrema: true ,
 			atanMeanSlope: true
@@ -742,18 +742,37 @@ describe( "Controllers" , function() {
 		
 		torqueFn = torqueFn.fx.bind( torqueFn ) ;
 		
-		var motor = physic.dynamics.TopSpeedLimitController.create( {
-			torqueFn: torqueFn
+		var motor = physic.dynamics.MotorController.create( {
+			torqueFn: torqueFn ,
+			motorInertia: 1
 		} ) ;
 		
 		var entity = physic.Entity.create( {
-			dynamics: [ topSpeedLimiter ]
+			dynamics: [ motor ]
 		} ) ;
 		
-		// Accel at 0 speed should be 6
-		entity.input.speedVector = physic.Vector3D( 8 , 0 , 0 ) ;
-		topSpeedLimiter.apply( entity , 0.1 ) ;
+		entity.input.throttle = 1 ;
+		entity.extra.rpm = 6000 ;
+		motor.apply( entity , 0.1 ) ;
 		//console.log( entity ) ;
-		expectCirca( entity.boundVector.vector.x , 0.6 ) ;
+		expectCirca( entity.extra.rpm , 6000 + 30 * 30 / Math.PI ) ;
+		
+		entity.input.throttle = 0.5 ;
+		entity.extra.rpm = 6000 ;
+		motor.apply( entity , 0.1 ) ;
+		//console.log( entity ) ;
+		expectCirca( entity.extra.rpm , 6000 + 15 * 30 / Math.PI ) ;
+		
+		entity.input.throttle = 1 ;
+		entity.extra.rpm = 4000 ;
+		motor.apply( entity , 0.1 ) ;
+		//console.log( entity ) ;
+		expectCirca( entity.extra.rpm , 4000 + 20 * 30 / Math.PI ) ;
+		
+		entity.input.throttle = -1 ;
+		entity.extra.rpm = 4000 ;
+		motor.apply( entity , 0.1 ) ;
+		//console.log( entity ) ;
+		expectCirca( entity.extra.rpm , 4000 - 40 * 30 / Math.PI ) ;
 	} ) ;
 } ) ;
