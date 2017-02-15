@@ -679,6 +679,8 @@ describe( "Controllers" , function() {
 		} ) ;
 		
 		var entity = physic.Entity.create( {
+			material: physic.Material.create() , // Mandatory
+			shape: physic.Shape.createDot() , // Mandatory
 			dynamics: [ topSpeedLimiter ]
 		} ) ;
 		
@@ -748,6 +750,8 @@ describe( "Controllers" , function() {
 		} ) ;
 		
 		var entity = physic.Entity.create( {
+			material: physic.Material.create() , // Mandatory
+			shape: physic.Shape.createDot() , // Mandatory
 			dynamics: [ motor ]
 		} ) ;
 		
