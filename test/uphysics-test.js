@@ -673,14 +673,16 @@ describe( "Controllers" , function() {
 	
 	it( "TopSpeedLimit controller" , function() {
 		var topSpeedLimiter = physic.dynamics.TopSpeedLimitController.create( {
-			maxAcceleration: 6 ,
-			topSpeed: 8 ,
 			topSpeedViolationBrake: 10 ,
 		} ) ;
 		
 		var entity = physic.Entity.create( {
 			material: physic.Material.create() , // Mandatory
 			shape: physic.Shape.createDot() , // Mandatory
+			data: {
+				topSpeed: 8 ,
+				baseAcceleration: 6
+			} ,
 			dynamics: [ topSpeedLimiter ]
 		} ) ;
 		
@@ -756,27 +758,27 @@ describe( "Controllers" , function() {
 		} ) ;
 		
 		entity.input.throttle = 1 ;
-		entity.extra.rpm = 6000 ;
+		entity.data.rpm = 6000 ;
 		motor.apply( entity , 0.1 ) ;
 		//console.log( entity ) ;
-		expectCirca( entity.extra.rpm , 6000 + 30 * 30 / Math.PI ) ;
+		expectCirca( entity.data.rpm , 6000 + 30 * 30 / Math.PI ) ;
 		
 		entity.input.throttle = 0.5 ;
-		entity.extra.rpm = 6000 ;
+		entity.data.rpm = 6000 ;
 		motor.apply( entity , 0.1 ) ;
 		//console.log( entity ) ;
-		expectCirca( entity.extra.rpm , 6000 + 15 * 30 / Math.PI ) ;
+		expectCirca( entity.data.rpm , 6000 + 15 * 30 / Math.PI ) ;
 		
 		entity.input.throttle = 1 ;
-		entity.extra.rpm = 4000 ;
+		entity.data.rpm = 4000 ;
 		motor.apply( entity , 0.1 ) ;
 		//console.log( entity ) ;
-		expectCirca( entity.extra.rpm , 4000 + 20 * 30 / Math.PI ) ;
+		expectCirca( entity.data.rpm , 4000 + 20 * 30 / Math.PI ) ;
 		
 		entity.input.throttle = -1 ;
-		entity.extra.rpm = 4000 ;
+		entity.data.rpm = 4000 ;
 		motor.apply( entity , 0.1 ) ;
 		//console.log( entity ) ;
-		expectCirca( entity.extra.rpm , 4000 - 40 * 30 / Math.PI ) ;
+		expectCirca( entity.data.rpm , 4000 - 40 * 30 / Math.PI ) ;
 	} ) ;
 } ) ;
