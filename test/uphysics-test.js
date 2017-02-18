@@ -302,6 +302,35 @@ describe( "Shape discrete collisions" , function() {
 
 describe( "Shape continuous collisions" , function() {
 	
+	it( "dot against plane" , function() {
+		var collision ;
+		var dotShape = physic.Shape.createDot() ;
+		var dotOldPos = physic.Vector3D( 0 , 0 , 4 ) ;
+		var dotPos = physic.Vector3D( 0 , 0 , -1 ) ;
+		var planeShape = physic.Shape.createPlane( physic.Vector3D( 0 , 0 , 1 ) ) ;
+		var planeOldPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		var planePos = physic.Vector3D( 0 , 0 , 0 ) ;
+		
+		collision = dotShape.getContinuousCollision( dotOldPos , dotPos , planeShape , planeOldPos , planePos ) ;
+		//console.log( collision ) ;
+		expect( collision.t ).to.be( 0.8 ) ;
+		expect( collision.displacement ).to.eql( { x: 0, y: 0, z: 1 } ) ;
+		expect( collision.normal ).to.eql( { x: 0, y: 0, z: 1 } ) ;
+	} ) ;
+	
+	it( "dot against plane: tangential move" , function() {
+		var collision ;
+		var dotShape = physic.Shape.createDot() ;
+		var dotOldPos = physic.Vector3D( 5 , 0 , 0 ) ;
+		var dotPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		var planeShape = physic.Shape.createPlane( physic.Vector3D( 0 , 0 , 1 ) ) ;
+		var planeOldPos = physic.Vector3D( 0 , 0 , 0 ) ;
+		var planePos = physic.Vector3D( 0 , 0 , 0 ) ;
+		
+		collision = dotShape.getContinuousCollision( dotOldPos , dotPos , planeShape , planeOldPos , planePos ) ;
+		expect( collision ).to.be( null ) ;
+	} ) ;
+	
 	it( "dot against box" , function() {
 		var collision ;
 		var dotShape = physic.Shape.createDot() ;
@@ -782,3 +811,5 @@ describe( "Controllers" , function() {
 		expectCirca( entity.data.rpm , 4000 - 40 * 30 / Math.PI ) ;
 	} ) ;
 } ) ;
+
+
