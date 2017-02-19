@@ -717,45 +717,60 @@ describe( "Controllers" , function() {
 		
 		// Accel at 0 speed should be 6
 		entity.input.speedVector = physic.Vector3D( 8 , 0 , 0 ) ;
+		entity.forces.setNull() ;
+		entity.brakingForces = 0 ;
 		topSpeedLimiter.apply( entity , 0.1 ) ;
 		//console.log( entity ) ;
-		expectCirca( entity.boundVector.vector.x , 0.6 ) ;
+		expectCirca( entity.forces.x , 6 ) ;
 		
 		// Accel at half of top-speed should be 3
 		entity.boundVector.vector.x = 4 ;
+		entity.forces.setNull() ;
+		entity.brakingForces = 0 ;
 		topSpeedLimiter.apply( entity , 0.1 ) ;
 		//console.log( entity ) ;
-		expectCirca( entity.boundVector.vector.x , 4.3 ) ;
+		expectCirca( entity.forces.x , 3 ) ;
 		
 		// Accel at 3/4 of top-speed should be 1.5
 		entity.boundVector.vector.x = 6 ;
+		entity.forces.setNull() ;
+		entity.brakingForces = 0 ;
 		topSpeedLimiter.apply( entity , 0.1 ) ;
 		//console.log( entity ) ;
-		expectCirca( entity.boundVector.vector.x , 6.15 ) ;
+		expectCirca( entity.forces.x , 1.5 ) ;
 		
 		// Accel at top-speed should be 0
 		entity.boundVector.vector.x = 8 ;
+		entity.forces.setNull() ;
+		entity.brakingForces = 0 ;
 		topSpeedLimiter.apply( entity , 0.1 ) ;
 		//console.log( entity ) ;
-		expectCirca( entity.boundVector.vector.x , 8 ) ;
+		expectCirca( entity.forces.x , 0 ) ;
 		
 		// Accel at top-speed violation should be negative: -10
 		entity.boundVector.vector.x = 16 ;
+		entity.forces.setNull() ;
+		entity.brakingForces = 0 ;
 		topSpeedLimiter.apply( entity , 0.1 ) ;
 		//console.log( entity ) ;
-		expectCirca( entity.boundVector.vector.x , 15 ) ;
+		expectCirca( entity.forces.x , 0 ) ;
+		expectCirca( entity.brakingForces , 10 ) ;
 		
 		// Accel when breaking from half of top-speed should be negative: 9
 		entity.boundVector.vector.x = -4 ;
+		entity.forces.setNull() ;
+		entity.brakingForces = 0 ;
 		topSpeedLimiter.apply( entity , 0.1 ) ;
 		//console.log( entity ) ;
-		expectCirca( entity.boundVector.vector.x , -3.1 ) ;
+		expectCirca( entity.forces.x , 9 ) ;
 		
 		// Accel when breaking from top-speed should be negative: 12
 		entity.boundVector.vector.x = -8 ;
+		entity.forces.setNull() ;
+		entity.brakingForces = 0 ;
 		topSpeedLimiter.apply( entity , 0.1 ) ;
 		//console.log( entity ) ;
-		expectCirca( entity.boundVector.vector.x , -6.8 ) ;
+		expectCirca( entity.forces.x , 12 ) ;
 	} ) ;
 	
 	it( "Motor controller (wip)" , function() {
