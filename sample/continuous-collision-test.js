@@ -1,39 +1,40 @@
+#!/usr/bin/env node
 
-var physic = require( '../lib/physic.js' ) ;
+const physic = require( '../lib/physic.js' ) ;
 
 
-var cubePos = physic.Vector3D( 0 , 0 , 0 ) ;
-var boxPos = physic.Vector3D( 0 , 0 , 0 ) ;
-var dotPos = physic.Vector3D( 0 , 0 , 0 ) ;
-var spherePos = physic.Vector3D( 0 , 0 , 0 ) ;
-var sphere2Pos = physic.Vector3D( 0 , 0 , 0 ) ;
-var iCylinderPos = physic.Vector3D( 0 , 0 , 0 ) ;
-var iCylinder2Pos = physic.Vector3D( 0 , 0 , 0 ) ;
-var cylinderPos = physic.Vector3D( 0 , 0 , 0 ) ;
-var cylinder2Pos = physic.Vector3D( 0 , 0 , 0 ) ;
-var octahedronPos = physic.Vector3D( 0 , 0 , 0 ) ;
+var cubePos = new physic.Vector3D( 0 , 0 , 0 ) ;
+var boxPos = new physic.Vector3D( 0 , 0 , 0 ) ;
+var dotPos = new physic.Vector3D( 0 , 0 , 0 ) ;
+var spherePos = new physic.Vector3D( 0 , 0 , 0 ) ;
+var sphere2Pos = new physic.Vector3D( 0 , 0 , 0 ) ;
+var iCylinderPos = new physic.Vector3D( 0 , 0 , 0 ) ;
+var iCylinder2Pos = new physic.Vector3D( 0 , 0 , 0 ) ;
+var cylinderPos = new physic.Vector3D( 0 , 0 , 0 ) ;
+var cylinder2Pos = new physic.Vector3D( 0 , 0 , 0 ) ;
+var octahedronPos = new physic.Vector3D( 0 , 0 , 0 ) ;
 
-var cubeOldPos = physic.Vector3D( 5 , 0 , 0 ) ;
-var boxOldPos = physic.Vector3D( 5 , 0 , 0 ) ;
-var dotOldPos = physic.Vector3D( 5 , 0 , 0 ) ;
-var sphereOldPos = physic.Vector3D( 5 , 0 , 0 ) ;
-var sphere2OldPos = physic.Vector3D( 5 , 0 , 0 ) ;
-var cylinderOldPos = physic.Vector3D( 5 , 0 , 0 ) ;
-var cylinder2OldPos = physic.Vector3D( 5 , 0 , 0 ) ;
-var iCylinderOldPos = physic.Vector3D( 5 , 0 , 0 ) ;
-var iCylinder2OldPos = physic.Vector3D( 5 , 0 , 0 ) ;
-var octahedronOldPos = physic.Vector3D( 5 , 0 , 0 ) ;
+var cubeOldPos = new physic.Vector3D( 5 , 0 , 0 ) ;
+var boxOldPos = new physic.Vector3D( 5 , 0 , 0 ) ;
+var dotOldPos = new physic.Vector3D( 5 , 0 , 0 ) ;
+var sphereOldPos = new physic.Vector3D( 5 , 0 , 0 ) ;
+var sphere2OldPos = new physic.Vector3D( 5 , 0 , 0 ) ;
+var cylinderOldPos = new physic.Vector3D( 5 , 0 , 0 ) ;
+var cylinder2OldPos = new physic.Vector3D( 5 , 0 , 0 ) ;
+var iCylinderOldPos = new physic.Vector3D( 5 , 0 , 0 ) ;
+var iCylinder2OldPos = new physic.Vector3D( 5 , 0 , 0 ) ;
+var octahedronOldPos = new physic.Vector3D( 5 , 0 , 0 ) ;
 
-var cubeShape = physic.Shape.Box.create( 2 , 2 , 2 ) ;
-var boxShape = physic.Shape.Box.create( 3 , 4 , 5 ) ;
-var dotShape = physic.Shape.Dot.create() ;
-var sphereShape = physic.Shape.Sphere.create( 2 ) ;
-var sphere2Shape = physic.Shape.Sphere.create( 1 ) ;
-var cylinderShape = physic.Shape.Cylinder.create( { x: 0, y: 0, z: 1 } , 1 , 2 ) ;
-var cylinder2Shape = physic.Shape.Cylinder.create( { x: 0, y: 0, z: 1 } , 1 , 2 ) ;
-var iCylinderShape = physic.Shape.InfiniteCylinder.create( { x: 0, y: 0, z: 1 } , 1.5 ) ;
-var iCylinder2Shape = physic.Shape.InfiniteCylinder.create( { x: 0, y: 0, z: 1 } , 1.5 ) ;
-var octahedronShape = physic.Shape.Octahedron.create( 2 ) ;
+var cubeShape = physic.Shape.createBox( 2 , 2 , 2 ) ;
+var boxShape = physic.Shape.createBox( 3 , 4 , 5 ) ;
+var dotShape = physic.Shape.createDot() ;
+var sphereShape = physic.Shape.createSphere( 2 ) ;
+var sphere2Shape = physic.Shape.createSphere( 1 ) ;
+var cylinderShape = physic.Shape.createCylinder( { x: 0, y: 0, z: 1 } , 1 , 2 ) ;
+var cylinder2Shape = physic.Shape.createCylinder( { x: 0, y: 0, z: 1 } , 1 , 2 ) ;
+var iCylinderShape = physic.Shape.createInfiniteCylinder( { x: 0, y: 0, z: 1 } , 1.5 ) ;
+var iCylinder2Shape = physic.Shape.createInfiniteCylinder( { x: 0, y: 0, z: 1 } , 1.5 ) ;
+var octahedronShape = physic.Shape.createOctahedron( 2 ) ;
 
 
 //*
@@ -127,6 +128,4 @@ console.log( cubeShape.getContinuousCollision( cubePos , boxShape , boxPos ) ) ;
 console.log() ;
 console.log( boxShape.getContinuousCollision( boxPos , cubeShape , cubePos ) ) ;
 //*/
-
-
 

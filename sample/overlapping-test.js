@@ -1,18 +1,19 @@
+#!/usr/bin/env node
 
-var physic = require( '../lib/physic.js' ) ;
+const physic = require( '../lib/physic.js' ) ;
 
 
-var cubePos = physic.Vector3D( 0 , 0 , 0 ) ;
-var boxPos = physic.Vector3D( 0 , 0 , 0 ) ;
-var dotPos = physic.Vector3D( 0 , 0 , 0 ) ;
-var spherePos = physic.Vector3D( 0 , 0 , 0 ) ;
-var sphere2Pos = physic.Vector3D( 0 , 0 , 0 ) ;
+var cubePos = new physic.Vector3D( 0 , 0 , 0 ) ;
+var boxPos = new physic.Vector3D( 0 , 0 , 0 ) ;
+var dotPos = new physic.Vector3D( 0 , 0 , 0 ) ;
+var spherePos = new physic.Vector3D( 0 , 0 , 0 ) ;
+var sphere2Pos = new physic.Vector3D( 0 , 0 , 0 ) ;
 
-var cubeShape = physic.Shape.Box.create( 2 , 2 , 2 ) ;
-var boxShape = physic.Shape.Box.create( 3 , 4 , 5 ) ;
-var dotShape = physic.Shape.Dot.create() ;
-var sphereShape = physic.Shape.Sphere.create( 2 ) ;
-var sphere2Shape = physic.Shape.Sphere.create( 1 ) ;
+var cubeShape = physic.Shape.createBox( 2 , 2 , 2 ) ;
+var boxShape = physic.Shape.createBox( 3 , 4 , 5 ) ;
+var dotShape = physic.Shape.createDot() ;
+var sphereShape = physic.Shape.createSphere( 2 ) ;
+var sphere2Shape = physic.Shape.createSphere( 1 ) ;
 
 
 /*
@@ -41,13 +42,11 @@ console.log( dotShape.isOverlapping( dotPos , cubeShape , cubePos ) ) ;
 
 
 //*
-boxShape = physic.Shape.Box.create( 1 , 5 , 5 ) ;
+boxShape = physic.Shape.createBox( 1 , 5 , 5 ) ;
 boxPos.set( 1 , 0 , 0 ) ;
 console.log() ;
 console.log( cubeShape.isOverlapping( cubePos , boxShape , boxPos ) ) ;
 console.log() ;
 console.log( boxShape.isOverlapping( boxPos , cubeShape , cubePos ) ) ;
 //*/
-
-
 

@@ -1,31 +1,11 @@
+#!/usr/bin/env node
 
-var physic = require( '../lib/physic.js' ) ;
-var term = require( 'terminal-kit' ).terminal ;
-
-
-
-// Initialize the gamepad library
-
-var gamepad = require( 'gamepad' ) ;
-term.magenta( "\nThis works using a gamepad\n\n" ) ;
-
-gamepad.init() ;
-
-// Create a game loop and poll for events
-setInterval( gamepad.processEvents , 16 ) ;
-
-// Scan for new gamepads as a slower rate
-setInterval( gamepad.detectDevices , 500 ) ;
-
-gamepad.on( 'attach' , function( id , state ) {
-	term.blue( 'attach %Y\n' , state ) ;
-} ) ;
+const physic = require( '../lib/physic.js' ) ;
+const term = require( 'terminal-kit' ).terminal ;
 
 
 
-// Init the motor
-
-var torqueFn = physic.Fn.create( [
+var torqueFn = new physic.Fn( [
 	{ x: 0 , fx: 30 } ,
 	{ x: 1000 , fx: 100 } ,
 	{ x: 4000 , fx: 200 } ,
@@ -43,30 +23,45 @@ var torqueFn = physic.Fn.create( [
 
 torqueFn = torqueFn.fx.bind( torqueFn ) ;
 
-var motor = physic.dynamics.MotorController.create( {
+var motor = new physic.dynamics.MotorController( {
 	torqueFn: torqueFn ,
 	motorInertia: 0.4 ,
 	engineBrakingTorquePerRpm: 0.08 ,
 } ) ;
 
-var entity = physic.Entity.create( {
+var entity = new physic.Entity( {
+	material: new physic.Material() , // Mandatory
+	shape: physic.Shape.createDot() , // Mandatory
 	dynamics: [ motor ]
 } ) ;
 
 
 
 // Listen for move events on all gamepads
+/*
 gamepad.on( 'move' , function( id , axis , value ) {
 	entity.input.throttle = value ;
 } ) ;
+*/
+term.grabInput( { mouse: 'motion' } ) ;
 
+term.on( 'key' , key => {
+	if ( key === 'CTRL_C' ) {
+		term( "\n" ) ;
+		process.exit() ;
+	}
+} ) ;
 
+term.on( 'mouse' , ( type , data ) => {
+	entity.input.throttle = 1 - ( ( data.y - 1 ) / ( term.height - 1 ) ) ;
+} ) ;
 
-function update()
-{
+term.bold.green( "Move the mouse upward or downward to change the motor throttle\n" ) ;
+
+function update() {
 	motor.apply( entity , 0.1 ) ;
 	term.column( 1 ).eraseLineAfter() ;
-	term.bold.yellow( "%i RPM" , entity.extra.rpm ) ;
+	term.bold.yellow( "%i RPM (throttle: %P)" , entity.data.rpm , entity.input.throttle ) ;
 }
 
 setInterval( update , 100 ) ;
