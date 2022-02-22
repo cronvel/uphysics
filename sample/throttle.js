@@ -5,44 +5,27 @@ const term = require( 'terminal-kit' ).terminal ;
 
 
 
-var torqueFn = new physic.Fn( [
-	{ x: 0 , fx: 30 } ,
-	{ x: 1000 , fx: 100 } ,
-	{ x: 4000 , fx: 200 } ,
-	{ x: 6000 , fx: 300 } ,
-	{ x: 6500 , fx: 350 } ,
-	{ x: 7000 , fx: 300 } ,
-	{ x: 8000 , fx: 250 } ,
-	{ x: 9000 , fx: 200 } ,
-	{ x: 10000 , fx: 100 } ,
-	{ x: 100000 , fx: 0 } ,
-] , {
-	preserveExtrema: true ,
-	atanMeanSlope: true
-} ) ;
-
-torqueFn = torqueFn.fx.bind( torqueFn ) ;
-
-var motor = new physic.dynamics.MotorController( {
-	torqueFn: torqueFn ,
+var motor = new physic.dynamics.Motor( {
+	torquePerRpm: [
+		{ rpm: 0 , torque: 30 } ,
+		{ rpm: 1000 , torque: 100 } ,
+		{ rpm: 2000 , torque: 120 } ,
+		{ rpm: 4000 , torque: 200 } ,
+		{ rpm: 6000 , torque: 300 } ,
+		{ rpm: 6500 , torque: 350 } ,
+		{ rpm: 7000 , torque: 300 } ,
+		{ rpm: 8000 , torque: 250 } ,
+		{ rpm: 9000 , torque: 200 } ,
+		{ rpm: 10000 , torque: 100 } ,
+		{ rpm: 12000 , torque: 0 } ,
+		{ rpm: 20000 , torque: -200 }
+	] ,
+	brakeTorquePerRpm: 0.08 ,
+	brakeMinRpm: 1000 ,
 	motorInertia: 0.4 ,
-	engineBrakingTorquePerRpm: 0.08 ,
 } ) ;
-
-var entity = new physic.Entity( {
-	material: new physic.Material() , // Mandatory
-	shape: physic.Shape.createDot() , // Mandatory
-	dynamics: [ motor ]
-} ) ;
-
-
 
 // Listen for move events on all gamepads
-/*
-gamepad.on( 'move' , function( id , axis , value ) {
-	entity.input.throttle = value ;
-} ) ;
-*/
 term.grabInput( { mouse: 'motion' } ) ;
 
 term.on( 'key' , key => {
@@ -53,15 +36,15 @@ term.on( 'key' , key => {
 } ) ;
 
 term.on( 'mouse' , ( type , data ) => {
-	entity.input.throttle = 1 - ( ( data.y - 1 ) / ( term.height - 1 ) ) ;
+	motor.setThrottle( 1 - ( ( data.y - 1 ) / ( term.height - 1 ) ) ) ;
 } ) ;
 
 term.bold.green( "Move the mouse upward or downward to change the motor throttle\n" ) ;
 
 function update() {
-	motor.apply( entity , 0.1 ) ;
+	motor.apply( 0.1 ) ;
 	term.column( 1 ).eraseLineAfter() ;
-	term.bold.yellow( "%i RPM (throttle: %P)" , entity.data.rpm , entity.input.throttle ) ;
+	term.bold.yellow( "%i RPM (throttle: %P, torque: %[.2]f)" , motor.rpm , motor.throttle , motor.torque ) ;
 }
 
 setInterval( update , 100 ) ;
