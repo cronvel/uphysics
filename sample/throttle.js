@@ -2,6 +2,7 @@
 
 const physic = require( '../lib/physic.js' ) ;
 const term = require( 'terminal-kit' ).terminal ;
+const math = require( 'math-kit' ) ;
 
 
 
@@ -9,11 +10,12 @@ var motor = new physic.dynamics.Motor( {
 	torqueData: [
 		{ rpm: 0 , torque: 30 } ,
 		{ rpm: 1000 , torque: 100 } ,
-		{ rpm: 2000 , torque: 120 } ,
-		{ rpm: 3500 , torque: 200 } ,
-		{ rpm: 5000 , torque: 300 } ,
-		{ rpm: 5500 , torque: 350 } ,
-		{ rpm: 6000 , torque: 300 } ,
+		{ rpm: 1500 , torque: 200 } ,
+		{ rpm: 2500 , torque: 300 } ,
+		{ rpm: 3000 , torque: 340 } ,
+		{ rpm: 4500 , torque: 350 } ,
+		{ rpm: 5500 , torque: 330 } ,
+		{ rpm: 6500 , torque: 300 } ,
 		{ rpm: 7500 , torque: 250 } ,
 		{ rpm: 8500 , torque: 150 } ,
 		{ rpm: 9000 , torque: 100 } ,
@@ -32,6 +34,32 @@ term.on( 'key' , key => {
 	if ( key === 'CTRL_C' ) {
 		term( "\n" ) ;
 		process.exit() ;
+	}
+	else if ( key === 't' ) {
+		const GmTracer = require( 'math-kit/lib/tracer/GmTracer.js' ) ;
+		
+		var tracer = new GmTracer( {
+			width: 1000 ,
+			height: 800 ,
+			bgColor: '#000' ,
+			xmin: -1000 ,
+			xmax: 12000 ,
+			ymin: -100 ,
+			ymax: 500 ,
+			xUnit: 'rpm' ,
+			everyX: 1000 ,
+			yUnit: 'N.m' ,
+			everyY: 50 ,
+		} ) ;
+		
+		let torqueRpmFn = new math.fn.TransformFn( motor.torqueFn , 0 , Math.PI / 30 ) ;
+		
+		tracer.createImage() ;
+		tracer.drawAxis() ;
+		tracer.traceFn( torqueRpmFn , '#f0f' ) ;
+		//tracer.traceFn( motor.torqueFn , '#f0f' ) ;
+		//tracer.traceControlPoints( motor.torqueFn ) ;
+		tracer.saveImage( __dirname + "/torque-" + Math.round( motor.throttle * 100 ) + ".png" ) ;
 	}
 } ) ;
 
