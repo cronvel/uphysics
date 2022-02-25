@@ -7,7 +7,7 @@ const math = require( 'math-kit' ) ;
 
 
 // Parameters/starting conditions
-var timeStep = 0.05 ,
+var timeStep = 0.03 ,
 	maxTime = 20 ,
 	mass = 10 ,
 	springElasticity = 200 ,
@@ -23,8 +23,8 @@ var timeStep = 0.05 ,
 	one after the other, and use dot product for each indiviual “braking-acceleration”.
 	It doesn't works if all brakes are summed.
 	E.g.: Consider a ball at the very bouncing moment, it has F air drag in the -velocity direction and a F ground drag
-	on the ground plane. When closed to right angle, the F ground drag may well revert the xy velocity (z-up), because
-	when summed with the F air drag the dot product is positive.
+	on the ground plane. When velocity is closed to right angle (+z, z is up), the F ground drag may well revert the xy velocity,
+	because when summed with the F air drag the dot product is positive.
 */
 
 var springK = springElasticity / springRestLength ,
@@ -85,7 +85,9 @@ function updateVerlet( dt ) {
 
 
 
-var graphData = [] ;
+var graphDisplacementData = [] ;
+var graphVelocityData = [] ;
+var graphAccelerationData = [] ;
 
 function tracerReport() {
 	const GmTracer = require( 'math-kit/lib/tracer/GmTracer.js' ) ;
@@ -104,11 +106,15 @@ function tracerReport() {
 		everyY: 0.5 ,
 	} ) ;
 
-	let fn = new math.fn.InterpolatedFn( graphData ) ;
+	var displacementFn = new math.fn.InterpolatedFn( graphDisplacementData ) ;
+	var velocityFn = new math.fn.InterpolatedFn( graphVelocityData ) ;
+	var accelerationFn = new math.fn.InterpolatedFn( graphAccelerationData ) ;
 
 	tracer.createImage() ;
 	tracer.drawAxis() ;
-	tracer.traceFn( fn , '#f0f' ) ;
+	tracer.traceFn( accelerationFn , '#f00' ) ;
+	tracer.traceFn( velocityFn , '#0f0' ) ;
+	tracer.traceFn( displacementFn , '#00f' ) ;
 	tracer.saveImage( __dirname + "/spring-damper.png" ) ;
 }
 
@@ -127,7 +133,7 @@ function frameTextReport() {
 
 async function run() {
 	computeForces() ;
-	graphData.push( { x: time , fx: displacement } ) ;
+	graphDisplacementData.push( { x: time , fx: displacement } ) ;
 	frameTextReport() ;
 
 	while ( time <= maxTime ) {
@@ -138,7 +144,9 @@ async function run() {
 			updateVerlet( timeStep ) ;
 		}
 
-		graphData.push( { x: time , fx: displacement } ) ;
+		graphDisplacementData.push( { x: time , fx: displacement } ) ;
+		graphVelocityData.push( { x: time , fx: velocity } ) ;
+		graphAccelerationData.push( { x: time , fx: acceleration } ) ;
 		frameTextReport() ;
 	}
 	
