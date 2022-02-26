@@ -10,7 +10,7 @@ const math = require( 'math-kit' ) ;
 
 // Parameters/starting conditions
 var timeStep = 0.5 ,
-	maxTime = 10 ,
+	maxTime = 4 ,
 	mass = 10 ,
 	springElasticity = 200 ,
 	springRestLength = 1 ,
@@ -63,12 +63,12 @@ async function updatePredictorV3( dt ) {
 		stiffness = 0 ;
 		
 		// Act as if acceleration changed linearly
-		accelerationOfAcceleration = ( predictedAcceleration - initialAcceleration ) * dt ;
+		accelerationOfAcceleration = ( predictedAcceleration - initialAcceleration ) / dt ;
 		velocity = correctedVelocity = predictedVelocity + 0.5 * accelerationOfAcceleration * dt * dt ;
 		displacement = correctedDisplacement = predictedAcceleration + accelerationOfAcceleration * dt * dt * dt / 6 ;
 		computeForces() ;
 		correctedAcceleration = acceleration ;
-		term( "Correction -- d1: %[.3]f  v1: %[.3]f  a1: %[.3]f\n" , correctedDisplacement , correctedVelocity , correctedAcceleration ) ;
+		term( "Correction -- d1: %[.3]f  v1: %[.3]f  a1: %[.3]f  a': %[.3]f\n" , correctedDisplacement , correctedVelocity , correctedAcceleration , accelerationOfAcceleration ) ;
 
 		if ( predictedAcceleration * correctedAcceleration < 0 ) {
 			// Gosh! Acceleration switched sign between prediction and correction!
@@ -78,22 +78,17 @@ async function updatePredictorV3( dt ) {
 			// Velocity and correctedVelocity must have the same sign, if not, velocity give the correct impulse,
 			// and correctedVelocity give an estimation of how stiff the system is.
 			stiffness = 1 - correctedAcceleration / predictedAcceleration ;	// >1
-			stiffnessFactor = 1 / ( 1 + stiffness * stiffness ) ;
+			//stiffnessFactor = 1 / ( 1 + stiffness * stiffness ) ;
+			stiffnessFactor = 1 / ( 1 + stiffness ) ;
 			
 			// Unstiff the acceleration
-			correctedAcceleration = predictedAcceleration * stiffnessFactor ;
-			velocity = correctedVelocity = velocity + 0.5 * accelerationOfAcceleration * dt * dt ;
-			displacement = correctedDisplacement = displacement + accelerationOfAcceleration * dt * dt * dt / 6 ;
-			
-			
-			term.red( "Possible divergence detected =>  stiffness: %[.3]f  stiffness-factor: %[.3]f  unstiffed-v: %[.3]f  unstiffed-a: %[.3]f\n" , stiffness , stiffnessFactor , correctedVelocity , unstiffedAcceleration ) ;
-			// Apply that constant acceleration
-			correctedDisplacement = initialDisplacement + initialVelocity * dt + 0.5 * unstiffedAcceleration * dt * dt ;
+			acceleration = correctedAcceleration = initialAcceleration * stiffnessFactor ;
+			accelerationOfAcceleration = ( correctedAcceleration - initialAcceleration ) / dt ;
+			velocity = correctedVelocity = predictedVelocity + 0.5 * accelerationOfAcceleration * dt * dt ;
+			displacement = correctedDisplacement = predictedAcceleration + accelerationOfAcceleration * dt * dt * dt / 6 ;
+			term.red( "Possible divergence detected =>  stiffness: %[.3]f  stiffness-factor: %[.3]f  v1: %[.3]f  a1: %[.3]f  a': %[.3]f\n" , stiffness , stiffnessFactor , correctedVelocity , correctedAcceleration , accelerationOfAcceleration ) ;
 		}
 		
-		displacement = correctedDisplacement ;
-		velocity = correctedVelocity ;
-		acceleration = correctedAcceleration ;
 		term( "Final correction -- d1: %[.3]f  v1: %[.3]f  a1: %[.3]f\n" , displacement , velocity , acceleration ) ;
 	}
 	
@@ -122,7 +117,7 @@ async function updatePredictorV2( dt ) {
 		stiffness = 0 ;
 		
 		// Act as if acceleration changed linearly
-		accelerationOfAcceleration = ( acceleration - initialAcceleration ) * dt ;
+		accelerationOfAcceleration = ( acceleration - initialAcceleration ) / dt ;
 		correctedDisplacement = displacement + accelerationOfAcceleration * dt * dt * dt / 6 ;
 		correctedVelocity = velocity + 0.5 * accelerationOfAcceleration * dt * dt ;
 		term( "Correction -- d1: %[.3]f  v1: %[.3]f\n" , correctedDisplacement , correctedVelocity ) ;
@@ -178,7 +173,7 @@ async function updatePredictorV1( dt ) {
 		
 		//*/
 		// Act as if acceleration changed linearly
-		accelerationOfAcceleration = ( acceleration - initialAcceleration ) * dt ;
+		accelerationOfAcceleration = ( acceleration - initialAcceleration ) / dt ;
 
 		//*
 		// /!\ This condition should be improved
