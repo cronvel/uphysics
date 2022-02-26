@@ -9,13 +9,13 @@ const math = require( 'math-kit' ) ;
 
 
 // Parameters/starting conditions
-var timeStep = 0.5 ,
-	maxTime = 4 ,
+var timeStep = 0.01 ,
+	maxTime = 10 ,
 	mass = 10 ,
 	springElasticity = 200 ,
 	springRestLength = 1 ,
 	dampingFactor = 200 ,
-	displacement = -0.75 ,
+	displacement = -1 ,
 	velocity = 0 ,
 	externalForce = -98 ,
 	//update = updateVerletBrakeAlgo ;
@@ -40,6 +40,8 @@ var springK = springElasticity / springRestLength ,
 
 
 
+const EPSILON_PREDICTOR_V4_STIFFNESS = 0.01 ;
+
 async function updatePredictorV3( dt ) {
 	var accelerationOfAcceleration , unstiffedAcceleration , stiffness , stiffnessFactor ;
 	var correctedDisplacement , correctedVelocity , correctedAcceleration ;
@@ -51,8 +53,8 @@ async function updatePredictorV3( dt ) {
 	term( "Initial -- d0: %[.3]f  v0: %[.3]f  a0: %[.3]f\n" , initialDisplacement , initialVelocity , initialAcceleration ) ;
 	
 	// First, try with constant acceleration
-	velocity = predictedVelocity = velocity + initialAcceleration * dt ;
-	displacement = predictedDisplacement = displacement + initialVelocity * dt + 0.5 * initialAcceleration * dt * dt ;
+	velocity = predictedVelocity = initialVelocity + initialAcceleration * dt ;
+	displacement = predictedDisplacement = initialDisplacement + initialVelocity * dt + 0.5 * initialAcceleration * dt * dt ;
 	computeForces() ;
 	predictedAcceleration = acceleration ;
 
@@ -65,28 +67,33 @@ async function updatePredictorV3( dt ) {
 		// Act as if acceleration changed linearly
 		accelerationOfAcceleration = ( predictedAcceleration - initialAcceleration ) / dt ;
 		velocity = correctedVelocity = predictedVelocity + 0.5 * accelerationOfAcceleration * dt * dt ;
-		displacement = correctedDisplacement = predictedAcceleration + accelerationOfAcceleration * dt * dt * dt / 6 ;
+		displacement = correctedDisplacement = predictedDisplacement + accelerationOfAcceleration * dt * dt * dt / 6 ;
 		computeForces() ;
 		correctedAcceleration = acceleration ;
 		term( "Correction -- d1: %[.3]f  v1: %[.3]f  a1: %[.3]f  a': %[.3]f\n" , correctedDisplacement , correctedVelocity , correctedAcceleration , accelerationOfAcceleration ) ;
+		
+		stiffness = 0 ;
 
-		if ( predictedAcceleration * correctedAcceleration < 0 ) {
+		if ( predictedAcceleration * correctedAcceleration < 0 && Math.abs( predictedAcceleration - correctedAcceleration ) > EPSILON_PREDICTOR_V4_STIFFNESS ) {
 			// Gosh! Acceleration switched sign between prediction and correction!
 			// We are probably in a stiff situation!
 			// Time for the special anti-divergence/explosion code!
 			
-			// Velocity and correctedVelocity must have the same sign, if not, velocity give the correct impulse,
-			// and correctedVelocity give an estimation of how stiff the system is.
+			// Compute the “stiffness”
 			stiffness = 1 - correctedAcceleration / predictedAcceleration ;	// >1
-			//stiffnessFactor = 1 / ( 1 + stiffness * stiffness ) ;
-			stiffnessFactor = 1 / ( 1 + stiffness ) ;
+			stiffnessFactor = 1 / stiffness ;
+			term.red( "Possible divergence detected =>  stiffness: %[.3]f  stiffness-factor: %[.3]f\n" , stiffness , stiffnessFactor ) ;
 			
-			// Unstiff the acceleration
-			acceleration = correctedAcceleration = initialAcceleration * stiffnessFactor ;
-			accelerationOfAcceleration = ( correctedAcceleration - initialAcceleration ) / dt ;
-			velocity = correctedVelocity = predictedVelocity + 0.5 * accelerationOfAcceleration * dt * dt ;
-			displacement = correctedDisplacement = predictedAcceleration + accelerationOfAcceleration * dt * dt * dt / 6 ;
-			term.red( "Possible divergence detected =>  stiffness: %[.3]f  stiffness-factor: %[.3]f  v1: %[.3]f  a1: %[.3]f  a': %[.3]f\n" , stiffness , stiffnessFactor , correctedVelocity , correctedAcceleration , accelerationOfAcceleration ) ;
+			// It's seems that it's a very bad idea to patch the acceleration output, since error are carried over the next stage.
+			// Instead, we will patch the initial acceleration to make it less brutal.
+			// We are more in heuristic realm than in accuracy realm here, we just want to prevent explosion and gain stability.
+			let rewrittenInitialAcceleration = initialAcceleration * stiffnessFactor ;
+			velocity = correctedVelocity = initialVelocity + rewrittenInitialAcceleration * dt ;
+			displacement = correctedDisplacement = initialDisplacement + initialVelocity * dt + 0.5 * rewrittenInitialAcceleration * dt * dt ;
+			computeForces() ;
+			correctedAcceleration = acceleration ;
+			//term( "Retro correction -- d1: %[.3]f  v1: %[.3]f  a0: %[.3]f  a1: %[.3]f  a': %[.3]f\n" , correctedDisplacement , correctedVelocity , rewrittenInitialAcceleration , correctedAcceleration , accelerationOfAcceleration ) ;
+			term( "Retro correction -- d1: %[.3]f  v1: %[.3]f  a0: %[.3]f  a1: %[.3]f\n" , correctedDisplacement , correctedVelocity , rewrittenInitialAcceleration , correctedAcceleration ) ;
 		}
 		
 		term( "Final correction -- d1: %[.3]f  v1: %[.3]f  a1: %[.3]f\n" , displacement , velocity , acceleration ) ;
@@ -348,8 +355,8 @@ function tracerReport() {
 		bgColor: '#000' ,
 		xmin: -1 ,
 		xmax: maxTime ,
-		ymin: -1.5 ,
-		ymax: 1.5 ,
+		ymin: -2 ,
+		ymax: 2 ,
 		xUnit: 's' ,
 		everyX: 1 ,
 		yUnit: 'm' ,
