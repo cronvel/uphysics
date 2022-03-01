@@ -8,11 +8,12 @@ const math = require( 'math-kit' ) ;
 
 
 
-var timeStep = 1 ,
+var timeStep = 0.5 ,
 	maxTime = 8 ,
 	//integrator = 'euler' ,
 	//integrator = 'verlet' ,
 	integrator = 'predictor' ,
+	//integrator = 'predictorUnstiffed' ,
 	springK = 100 ,
 	dampingFactor = 20 ,
 	mass = 10 ,
