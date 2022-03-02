@@ -100,6 +100,9 @@ function createEntity( entity ) {
 	switch ( entity.shape.visualizer ) {
 		case 'infinitePlane' :
 			mesh = Babylon.MeshBuilder.CreatePlane( 'infinitePlane' , { size: 10 } , scene ) ;
+			
+			// /!\ For instance the real orientation of the plane is not used, we will have to used the shape's surface normal
+			
 			mesh.rotation.x = Math.PI / 2 ;
 			mesh.bakeCurrentTransformIntoVertices() ;
 			meshMaterial.diffuseColor = new Babylon.Color3( 0.5 , 0.5 , 0.5 ) ;
@@ -173,7 +176,7 @@ async function run() {
 			}
 		}
 		else if ( ! timer ) {
-			timer = setInterval( update , demo.timeStep * 1000 ) ;
+			timer = setInterval( update , world.timeStep * 1000 ) ;
 		}
 	} ;
 

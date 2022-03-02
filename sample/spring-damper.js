@@ -16,12 +16,12 @@ else {
 
 
 
-var timeStep = 0.05 ,
-	maxTime = 10 ,
+var timeStep = 0.1 ,
+	maxTime = 4 ,
 	//integrator = 'euler' ,
-	//integrator = 'verlet' ,
+	integrator = 'verlet' ,
 	//integrator = 'predictor' ,
-	integrator = 'predictorUnstiffed' ,
+	//integrator = 'predictorUnstiffed' ,
 	springK = 100 ,
 	dampingFactor = 20 ,
 	mass = 10 ,
@@ -36,9 +36,11 @@ var world = new physic.World( {
 } ) ;
 
 
+
 var dotShape = physic.Shape.createDot() ;
 var planeShape = physic.Shape.createPlane( new physic.Vector3D( 0 , 1 , 0 ) ) ;
-var basicMaterial = new physic.Material() ;
+var basicMaterial = new physic.Material( { isSolid: true } ) ;
+basicMaterial.setSelfInteraction( new physic.MaterialInteraction( { hq: true } ) ) ;
 
 var entity = new physic.Entity( {
 	shape: dotShape ,
@@ -149,7 +151,6 @@ function tracerReport() {
 exports.world = world ;
 exports.init = init ;
 exports.update = update ;
-exports.timeStep = timeStep ;
 
 if ( ! isElectron ) { runTerminal() ; }
 
