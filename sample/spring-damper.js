@@ -12,8 +12,8 @@ var timeStep = 0.5 ,
 	maxTime = 8 ,
 	//integrator = 'euler' ,
 	//integrator = 'verlet' ,
-	integrator = 'predictor' ,
-	//integrator = 'predictorUnstiffed' ,
+	//integrator = 'predictor' ,
+	integrator = 'predictorUnstiffed' ,
 	springK = 100 ,
 	dampingFactor = 20 ,
 	mass = 10 ,
@@ -95,7 +95,7 @@ function tracerReport() {
 		everyY: 0.5 ,
 	} ) ;
 	
-	var options = { preserveExtrema: true } ;
+	var options = { preserveExtrema: false , atanMeanDfx: false , order: 1 } ;
 
 	var positionFn = new math.fn.InterpolatedFn( graphPositionYData , options ) ;
 	var velocityFn = new math.fn.InterpolatedFn( graphVelocityYData , options ) ;
