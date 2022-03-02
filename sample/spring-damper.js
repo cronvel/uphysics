@@ -1,15 +1,23 @@
-#!/usr/bin/env node
 
 "use strict" ;
 
 const physic = require( '..' ) ;
-const term = require( 'terminal-kit' ).terminal ;
 const math = require( 'math-kit' ) ;
 
+var isElectron , term ;
+
+if ( process.type === 'renderer' ) {
+	isElectron = true ;
+}
+else {
+	isElectron = false ;
+	term = require( 'terminal-kit' ).terminal ;
+}
 
 
-var timeStep = 0.5 ,
-	maxTime = 8 ,
+
+var timeStep = 0.05 ,
+	maxTime = 10 ,
 	//integrator = 'euler' ,
 	//integrator = 'verlet' ,
 	//integrator = 'predictor' ,
@@ -29,7 +37,9 @@ var world = new physic.World( {
 
 
 var dotShape = physic.Shape.createDot() ;
+var planeShape = physic.Shape.createPlane( new physic.Vector3D( 0 , 1 , 0 ) ) ;
 var basicMaterial = new physic.Material() ;
+
 var entity = new physic.Entity( {
 	shape: dotShape ,
 	material: basicMaterial ,
@@ -42,14 +52,28 @@ var entity = new physic.Entity( {
 } ) ;
 world.addEntity( entity ) ;
 
+var plane = new physic.Entity( {
+	shape: planeShape ,
+	material: basicMaterial ,
+	isStatic: true ,
+} ) ;
+world.addEntity( plane ) ;
+
 
 
 var graphPositionYData = [] ;
 var graphVelocityYData = [] ;
 var graphAccelerationYData = [] ;
 
-async function run() {
-	world.computeInitialForces() ;
+
+
+function init() { world.computeInitialForces() ; }
+function update() { world.update() ; }
+
+
+
+async function runTerminal() {
+	init() ;
 
 	graphPositionYData.push( { x: world.time , fx: entity.position.y } ) ;
 	graphVelocityYData.push( { x: world.time , fx: entity.velocity.y } ) ;
@@ -58,7 +82,7 @@ async function run() {
 	frameTextReport() ;
 
 	while ( world.time < maxTime ) {
-		world.update() ;
+		update() ;
 
 		graphPositionYData.push( { x: world.time , fx: entity.position.y } ) ;
 		graphVelocityYData.push( { x: world.time , fx: entity.velocity.y } ) ;
@@ -122,5 +146,10 @@ function tracerReport() {
 
 
 
-run() ;
+exports.world = world ;
+exports.init = init ;
+exports.update = update ;
+exports.timeStep = timeStep ;
+
+if ( ! isElectron ) { runTerminal() ; }
 

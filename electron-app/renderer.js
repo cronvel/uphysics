@@ -39,26 +39,24 @@ const Babylon = require( 'babylonjs' ) ;
 require( 'babylonjs-loaders' ) ;
 require( 'earcut' ) ;
 
-var demo ;
-
 
 
 // standard global variables
 var scene , camera ;
 var canvas = document.getElementById( "renderCanvas" ) ;	// Get the canvas element
 var engine = new Babylon.Engine( canvas , true ) ;	// Generate the Babylon 3D engine
-var track ;
+var demo , world , entityMap = new Map() ;
 var $fps ;
 
 
 
 async function createScene() {
 	scene = new Babylon.Scene( engine ) ;
-	camera = new Babylon.FreeCamera( "Camera" , new Babylon.Vector3( 0 , 1 , 0 ) , scene ) ;
+	camera = new Babylon.FreeCamera( "Camera" , new Babylon.Vector3( 0 , 1 , -5 ) , scene ) ;
 	camera.attachControl( canvas , true ) ;
 	camera.wheelPrecision = 50 ;
 	camera.minZ = 0.001 ;
-	// Without that, roll rotation causes muche trouble
+	// Without that, roll rotation causes much trouble
 	camera.updateUpVectorFromRotation = true ;
 
 
@@ -92,28 +90,103 @@ async function createScene() {
 
 
 
+function createEntity( entity ) {
+	var meshMaterial , mesh ;
+
+	meshMaterial = new Babylon.StandardMaterial( 'meshmaterial' , scene ) ;
+	//meshMaterial.emissiveColor = new Babylon.Color3( 1 , 1 , 0 ) ;
+
+	console.log( "Add: " , entity.shape.visualizer ) ;
+	switch ( entity.shape.visualizer ) {
+		case 'infinitePlane' :
+			mesh = Babylon.MeshBuilder.CreatePlane( 'infinitePlane' , { size: 10 } , scene ) ;
+			mesh.rotation.x = Math.PI / 2 ;
+			mesh.bakeCurrentTransformIntoVertices() ;
+			meshMaterial.diffuseColor = new Babylon.Color3( 0.5 , 0.5 , 0.5 ) ;
+			break ;
+		case 'microCube' :
+		default :
+			mesh = Babylon.MeshBuilder.CreateBox( 'microCube' , { size: 0.1 } , scene ) ;
+			meshMaterial.diffuseColor = new Babylon.Color3( 1 , 1 , 0 ) ;
+			break ;
+	}
+
+	mesh.position = new Babylon.Vector3( entity.position.x , entity.position.y , entity.position.z ) ;
+	mesh.material = meshMaterial ;
+	
+	entityMap.set( entity , mesh ) ;
+	return mesh ;
+}
+
+
+
+function updateScene() {
+	var i , iMax = world.entities.length , entity , mesh ;
+
+	for ( i = 0 ; i < iMax ; i ++ ) {
+		entity = world.entities[ i ] ;
+		mesh = entityMap.get( entity ) ;
+		if ( ! mesh ) { mesh = createEntity( entity ) ; }
+
+		mesh.position.x = entity.position.x ;
+		mesh.position.y = entity.position.y ;
+		mesh.position.z = entity.position.z ;
+		//console.log( mesh.position.y ) ;
+	}
+}
+
+
+
 async function run() {
 	var demoFilePath = remote.getCurrentWindow().demoFilePath ;
-
-	if ( demoFilePath ) {
-		if ( ! path.isAbsolute( demoFilePath ) ) {
-			demoFilePath = path.join( remote.process.cwd() , demoFilePath ) ;
-		}
-
-		console.log( "demoFilePath:" , demoFilePath ) ;
-		demo = require( demoFilePath ) ;
-	}
+	console.log( "demoFilePath:" , demoFilePath ) ;
+	demo = require( demoFilePath ) ;
+	world = demo.world ;
 
 	await createScene() ;
 
 	var start = Date.now() ;
 	var log = false ;
+	var timer = null ;
+	var pause = true ;
+	
+	demo.init() ;
+	updateScene() ;
 
 	// Register a render loop to repeatedly render the scene
 	engine.runRenderLoop( () => {
 		$fps.innerHTML = engine.getFps().toFixed() ;
-		if ( demo ) { demo.update() ; }
 		scene.render() ;
+	} ) ;
+	
+	var update = () => {
+		demo.update() ;
+		updateScene() ;
+	} ;
+
+	var switchPause = () => {
+		pause = ! pause ;
+		if ( pause ) {
+			if ( timer ) {
+				clearInterval( timer ) ;
+				timer = null ;
+			}
+		}
+		else if ( ! timer ) {
+			timer = setInterval( update , demo.timeStep * 1000 ) ;
+		}
+	} ;
+
+	// Watch keys
+	window.addEventListener( "keydown" , event => {
+		switch ( event.key ) {
+			case ' ' :
+				switchPause() ;
+				break ;
+			case 's' :
+				if ( pause ) { update() ; }
+				break ;
+		}
 	} ) ;
 
 	// Watch for browser/canvas resize events

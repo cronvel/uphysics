@@ -29,6 +29,9 @@ const app = electron.app ;
 const BrowserWindow = electron.BrowserWindow ;
 const crashReporter = electron.crashReporter ;
 
+const path = require( 'path' ) ;
+const fs = require( 'fs' ) ;
+
 // Allow electron-remote to work on renderer-side
 const remoteMain = require( '@electron/remote/main' )
 remoteMain.initialize() ;
@@ -80,9 +83,30 @@ var demoFilePath = null ;
 for ( let arg of args ) {
 	if ( arg[ 0 ] !== '-' ) {
 		demoFilePath = arg ;
+
+		if ( ! path.isAbsolute( demoFilePath ) ) {
+			demoFilePath = path.join( process.cwd() , demoFilePath ) ;
+		}
+
+		if ( ! fs.existsSync( demoFilePath ) ) {
+			console.error( "Demo file does not exist:" , demoFilePath ) ;
+			app.quit() ;
+			return ;
+		}
+
 		break ;
 	}
 }
+
+if ( ! demoFilePath ) {
+	console.error( "Demo file required" ) ;
+	app.quit() ;
+	return ;
+}
+
+console.log( "demoFilePath:" , demoFilePath ) ;
+
+
 
 // This method will be called when atom-shell has done everything
 // initialization and ready for creating browser windows.
