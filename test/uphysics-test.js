@@ -699,7 +699,7 @@ describe( "Shape continuous collisions" , () => {
 
 describe( "Controllers" , () => {
 
-	it( "TopSpeedLimit controller" , () => {
+	it.skip( "TopSpeedLimit controller" , () => {
 		var topSpeedLimiter = new physic.dynamics.TopSpeedLimitController( {
 			topSpeedViolationBrake: 10
 		} ) ;
@@ -772,9 +772,9 @@ describe( "Controllers" , () => {
 		expectCirca( entity.forces.x , 12 ) ;
 	} ) ;
 
-	it( "Motor controller (wip)" , () => {
+	it.skip( "Motor controller (wip)" , () => {
 
-		var torqueFn = new physic.Fn( [
+		var torqueFn = new physic.fn.InterpolatedFn( [
 			{ x: 0 , fx: 30 } ,
 			{ x: 1000 , fx: 100 } ,
 			{ x: 4000 , fx: 200 } ,
@@ -789,7 +789,7 @@ describe( "Controllers" , () => {
 
 		torqueFn = torqueFn.fx.bind( torqueFn ) ;
 
-		var motor = new physic.dynamics.MotorController( {
+		var motor = new physic.dynamics.Motor( {
 			torqueFn: torqueFn ,
 			motorInertia: 1
 		} ) ;
