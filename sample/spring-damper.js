@@ -24,6 +24,7 @@ var timeStep = 0.1 ,
 	//integrator = 'predictorUnstiffed' ,
 	springK = 100 ,
 	dampingFactor = 20 ,
+	restLength = 0 ,
 	mass = 10 ,
 	initialY = 1.5 ,
 	initialVY = 0 ;
@@ -42,24 +43,23 @@ var planeShape = physic.Shape.createPlane( new physic.Vector3D( 0 , 1 , 0 ) ) ;
 var basicMaterial = new physic.Material( { isSolid: true } ) ;
 basicMaterial.setSelfInteraction( new physic.MaterialInteraction( { hq: true } ) ) ;
 
-var entity = new physic.Entity( {
+var springDamperDynamic = world.createDynamic( physic.dynamics.SpringDamper , { springK , dampingFactor , restLength } ) ;
+
+var entity = world.createEntity( {
 	shape: dotShape ,
 	material: basicMaterial ,
-	dynamics: [
-		new physic.dynamics.SpringDamper( springK , dampingFactor )
-	] ,
+	dynamics: [ springDamperDynamic ] ,
 	x: 0 , y: initialY , z: 0 ,
 	vx: 0 , vy: initialVY , vz: 0 ,
 	mass: mass
 } ) ;
-world.addEntity( entity ) ;
 
-var plane = new physic.Entity( {
+var plane = world.createEntity( {
 	shape: planeShape ,
 	material: basicMaterial ,
 	isStatic: true ,
+	dynamics: [ springDamperDynamic ] ,
 } ) ;
-world.addEntity( plane ) ;
 
 
 
