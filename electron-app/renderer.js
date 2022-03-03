@@ -188,6 +188,7 @@ async function run() {
 				break ;
 			case 's' :
 				if ( pause ) { update() ; }
+				else { switchPause() ; }
 				break ;
 		}
 	} ) ;

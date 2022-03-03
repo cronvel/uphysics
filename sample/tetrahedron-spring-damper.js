@@ -16,8 +16,8 @@ else {
 
 
 
-var timeStep = 0.01 ,
-	maxTime = 1 ,
+var timeStep = 0.05 ,
+	maxTime = 4 ,
 	//integrator = 'euler' ,
 	integrator = 'verlet' ,
 	//integrator = 'predictor' ,
@@ -26,7 +26,7 @@ var timeStep = 0.01 ,
 	dampingFactor = 50 ,
 	restLength = 1 ,
 	mass = 10 ,
-	initialVY = 10 ;
+	initialVY = 5 ;
 
 
 
@@ -51,6 +51,7 @@ var gravity = world.createDynamic( physic.dynamics.ConstantAcceleration , { acce
 	sdd34 = world.createDynamic( physic.dynamics.SpringDamper , { springK , dampingFactor , restLength } ) ;
 
 var ent1 = world.createEntity( {
+	id: 'ent#1' ,
 	shape: dotShape ,
 	material: basicMaterial ,
 	x: 0 , y: 0 , z: 0 ,
@@ -59,6 +60,7 @@ var ent1 = world.createEntity( {
 } ) ;
 
 var ent2 = world.createEntity( {
+	id: 'ent#2' ,
 	shape: dotShape ,
 	material: basicMaterial ,
 	x: 1 , y: 0 , z: 0 ,
@@ -67,6 +69,7 @@ var ent2 = world.createEntity( {
 } ) ;
 
 var ent3 = world.createEntity( {
+	id: 'ent#3' ,
 	shape: dotShape ,
 	material: basicMaterial ,
 	x: 0.5 , y: 0 , z: 0.5 ,
@@ -75,6 +78,7 @@ var ent3 = world.createEntity( {
 } ) ;
 
 var ent4 = world.createEntity( {
+	id: 'ent#4' ,
 	shape: dotShape ,
 	material: basicMaterial ,
 	x: 0.5 , y: 1 , z: 0.25 ,
@@ -93,6 +97,7 @@ sdd34.linkEntities( ent3 , ent4 ) ;
 gravity.linkEntities( ent1 , ent2 , ent3 , ent4 ) ;
 
 var plane = world.createEntity( {
+	id: 'static-plane' ,
 	shape: planeShape ,
 	material: basicMaterial ,
 	isStatic: true
@@ -118,7 +123,44 @@ async function runTerminal() {
 
 
 function frameTextReport() {
-	term.yellow( "T: %[.3]fs => y: %km vy: %km/s ay: %km/s²\n" , world.time , ent4.position.y , ent4.velocity.y , ent4.acceleration.y ) ;
+	term.yellow( "--- T: %[.3]fs --\n" , world.time ) ;
+	frameTextReportEnt( ent1 ) ;
+	frameTextReportEnt( ent2 ) ;
+	frameTextReportEnt( ent3 ) ;
+	frameTextReportEnt( ent4 ) ;
+}
+
+
+
+function frameTextReportEnt( ent ) {
+	if ( ent.position.y < -0.0001 ) {
+		term.red( "\t%s pos:(%[.3]f,%f,%[.3]f) vel:(%[.3]f,%[.3]f,%[.3]f) accel:(%[.3]f,%[.3]f,%[.3]f)\n" ,
+			ent.id ,
+			ent.position.x , ent.position.y , ent.position.z , 
+			ent.velocity.x , ent.velocity.y , ent.velocity.z , 
+			ent.acceleration.x , ent.acceleration.y , ent.acceleration.z
+		) ;
+		process.exit() ;
+		return ;
+	}
+
+	if ( ent.position.y <= 0 ) {
+		term.brightYellow( "\t%s pos:(%[.3]f,%f,%[.3]f) vel:(%[.3]f,%[.3]f,%[.3]f) accel:(%[.3]f,%[.3]f,%[.3]f)\n" ,
+			ent.id ,
+			ent.position.x , ent.position.y , ent.position.z , 
+			ent.velocity.x , ent.velocity.y , ent.velocity.z , 
+			ent.acceleration.x , ent.acceleration.y , ent.acceleration.z
+		) ;
+		return ;
+	}
+	
+
+	term.yellow( "\t%s pos:(%[.3]f,%[.3]f,%[.3]f) vel:(%[.3]f,%[.3]f,%[.3]f) accel:(%[.3]f,%[.3]f,%[.3]f)\n" ,
+		ent.id ,
+		ent.position.x , ent.position.y , ent.position.z , 
+		ent.velocity.x , ent.velocity.y , ent.velocity.z , 
+		ent.acceleration.x , ent.acceleration.y , ent.acceleration.z
+	) ;
 }
 
 
