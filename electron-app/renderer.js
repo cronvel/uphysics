@@ -55,6 +55,7 @@ async function createScene() {
 	camera = new Babylon.FreeCamera( "Camera" , new Babylon.Vector3( 0 , 1 , -5 ) , scene ) ;
 	camera.attachControl( canvas , true ) ;
 	camera.wheelPrecision = 50 ;
+	camera.speed = 0.1 ;
 	camera.minZ = 0.001 ;
 	// Without that, roll rotation causes much trouble
 	camera.updateUpVectorFromRotation = true ;

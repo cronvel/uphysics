@@ -16,17 +16,18 @@ else {
 
 
 
-var timeStep = 0.01 ,
+var timeStep = 0.005 ,
 	maxTime = 4 ,
 	//integrator = 'euler' ,
 	integrator = 'verlet' ,
 	//integrator = 'predictor' ,
 	//integrator = 'predictorUnstiffed' ,
-	springK = 1000 ,
-	dampingFactor = 50 ,
+	//springK = 3000 , dampingFactor = 100 ,
+	springK = 10000 , dampingFactor = 200 ,
 	restLength = 1 ,
 	mass = 10 ,
-	initialVY = 5 ;
+	subdivide = 2 ,
+	randomDisplacement = 0.1 ;
 
 
 
@@ -46,14 +47,14 @@ var gravity = world.createDynamic( physic.dynamics.ConstantAcceleration , { acce
 var structureTemplate = new physic.builders.SpringDamperStructure( {
 	dynamics: [ gravity ] ,
 	size: new physic.Vector3D( 1 , 1 , 2 ) ,
+	//size: new physic.Vector3D( 2 , 2 , 4 ) ,
 	material: basicMaterial ,
-	springK , dampingFactor , mass ,
+	subdivide , springK , dampingFactor , mass , randomDisplacement
 } ) ;
 
 var structure = structureTemplate.build( world , new physic.Vector3D( 0 , 2.5 , 0 ) ) ;
 
-//term( "Entity count: %i\nDynamic count: %i\n" , structure.entities.length , structure.dynamics.length ) ;
-//return ;
+console.log( "Entity count: %i\nDynamic count: %i\n" , structure.entities.length , structure.dynamics.length ) ;
 
 var plane = world.createEntity( {
 	id: 'static-plane' ,
