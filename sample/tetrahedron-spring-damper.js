@@ -16,7 +16,7 @@ else {
 
 
 
-var timeStep = 0.05 ,
+var timeStep = 0.01 ,
 	maxTime = 4 ,
 	//integrator = 'euler' ,
 	integrator = 'verlet' ,
