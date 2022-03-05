@@ -44,15 +44,15 @@ require( 'earcut' ) ;
 // standard global variables
 var scene , camera ;
 var canvas = document.getElementById( "renderCanvas" ) ;	// Get the canvas element
-var engine = new Babylon.Engine( canvas , true ) ;	// Generate the Babylon 3D engine
-var demo , world , entityMap = new Map() ;
+var engine = new BABYLON.Engine( canvas , true ) ;	// Generate the Babylon 3D engine
+var demo , world , entityMap = new Map() , dynamicMap = new Map() ;
 var $fps ;
 
 
 
 async function createScene() {
-	scene = new Babylon.Scene( engine ) ;
-	camera = new Babylon.FreeCamera( "Camera" , new Babylon.Vector3( 0 , 1 , -5 ) , scene ) ;
+	scene = new BABYLON.Scene( engine ) ;
+	camera = new BABYLON.FreeCamera( "Camera" , new BABYLON.Vector3( 0 , 1 , -5 ) , scene ) ;
 	camera.attachControl( canvas , true ) ;
 	camera.wheelPrecision = 50 ;
 	camera.speed = 0.1 ;
@@ -75,13 +75,13 @@ async function createScene() {
 	//*/
 
 	/*
-	var skybox = Babylon.MeshBuilder.CreateBox( "skyBox" , { size: 1000 } , scene ) ;
-	var skyboxMaterial = new Babylon.StandardMaterial( "skyBox" , scene ) ;
+	var skybox = BABYLON.MeshBuilder.CreateBox( "skyBox" , { size: 1000 } , scene ) ;
+	var skyboxMaterial = new BABYLON.StandardMaterial( "skyBox" , scene ) ;
 	skyboxMaterial.backFaceCulling = false ;
-	skyboxMaterial.reflectionTexture = new Babylon.CubeTexture( "../media/textures/skybox" , scene ) ;
-	skyboxMaterial.reflectionTexture.coordinatesMode = Babylon.Texture.SKYBOX_MODE ;
-	skyboxMaterial.diffuseColor = new Babylon.Color3( 0 , 0 , 0 ) ;
-	skyboxMaterial.specularColor = new Babylon.Color3( 0 , 0 , 0 ) ;
+	skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture( "../media/textures/skybox" , scene ) ;
+	skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE ;
+	skyboxMaterial.diffuseColor = new BABYLON.Color3( 0 , 0 , 0 ) ;
+	skyboxMaterial.specularColor = new BABYLON.Color3( 0 , 0 , 0 ) ;
 	skybox.material = skyboxMaterial ;
 	skybox.position = camera.position ;
 	*/
@@ -94,28 +94,28 @@ async function createScene() {
 function createEntity( entity ) {
 	var meshMaterial , mesh ;
 
-	meshMaterial = new Babylon.StandardMaterial( 'meshmaterial' , scene ) ;
-	//meshMaterial.emissiveColor = new Babylon.Color3( 1 , 1 , 0 ) ;
+	meshMaterial = new BABYLON.StandardMaterial( 'meshmaterial' , scene ) ;
+	//meshMaterial.emissiveColor = new BABYLON.Color3( 1 , 1 , 0 ) ;
 
 	console.log( "Add: " , entity.shape.visualizer ) ;
 	switch ( entity.shape.visualizer ) {
 		case 'infinitePlane' :
-			mesh = Babylon.MeshBuilder.CreatePlane( 'infinitePlane' , { size: 10 } , scene ) ;
+			mesh = BABYLON.MeshBuilder.CreatePlane( 'infinitePlane' , { size: 10 } , scene ) ;
 			
 			// /!\ For instance the real orientation of the plane is not used, we will have to used the shape's surface normal
 			
 			mesh.rotation.x = Math.PI / 2 ;
 			mesh.bakeCurrentTransformIntoVertices() ;
-			meshMaterial.diffuseColor = new Babylon.Color3( 0.5 , 0.5 , 0.5 ) ;
+			meshMaterial.diffuseColor = new BABYLON.Color3( 0.5 , 0.5 , 0.5 ) ;
 			break ;
 		case 'microCube' :
 		default :
-			mesh = Babylon.MeshBuilder.CreateBox( 'microCube' , { size: 0.1 } , scene ) ;
-			meshMaterial.diffuseColor = new Babylon.Color3( 1 , 1 , 0 ) ;
+			mesh = BABYLON.MeshBuilder.CreateBox( 'microCube' , { size: 0.1 } , scene ) ;
+			meshMaterial.diffuseColor = new BABYLON.Color3( 1 , 1 , 0 ) ;
 			break ;
 	}
 
-	mesh.position = new Babylon.Vector3( entity.position.x , entity.position.y , entity.position.z ) ;
+	mesh.position = new BABYLON.Vector3( entity.position.x , entity.position.y , entity.position.z ) ;
 	mesh.material = meshMaterial ;
 	
 	entityMap.set( entity , mesh ) ;
@@ -124,10 +124,36 @@ function createEntity( entity ) {
 
 
 
-function updateScene() {
-	var i , iMax = world.entities.length , entity , mesh ;
+function createLine( dynamic ) {
+	var points = dynamic.entities.map( entity => new BABYLON.Vector3(
+		entity.position.x ,
+		entity.position.y ,
+		entity.position.z
+	) ) ;
 
-	for ( i = 0 ; i < iMax ; i ++ ) {
+	var colors = dynamic.entities.map( ( entity , index ) => new BABYLON.Color4(
+		( index % 3 ) * 0.5 ,
+		( ( index + 1 ) % 3 ) * 0.5 ,
+		( ( index + 2 ) % 3 ) * 0.5 ,
+		1
+	) ) ;
+
+	var options = { points , colors , updatable: true } ;
+	
+	var line = BABYLON.MeshBuilder.CreateLines( 'line' , options ) ;
+	options.instance = line ;
+	line.options = options ;	// save it on the object, to avoid storing it on a separated Map
+	
+	dynamicMap.set( dynamic , line ) ;
+	return line ;
+}
+
+
+
+function updateScene() {
+	var i , iMax , j , jMax , entity , dynamic , mesh , line , point ;
+
+	for ( i = 0 , iMax = world.entities.length ; i < iMax ; i ++ ) {
 		entity = world.entities[ i ] ;
 		mesh = entityMap.get( entity ) ;
 		if ( ! mesh ) { mesh = createEntity( entity ) ; }
@@ -136,6 +162,24 @@ function updateScene() {
 		mesh.position.y = entity.position.y ;
 		mesh.position.z = entity.position.z ;
 		//console.log( mesh.position.y ) ;
+	}
+
+	for ( i = 0 , iMax = world.dynamics.length ; i < iMax ; i ++ ) {
+		dynamic = world.dynamics[ i ] ;
+		if ( dynamic.fixedEntityCount !== 2 ) { continue ; }
+		line = dynamicMap.get( dynamic ) ;
+		if ( ! line ) { line = createLine( dynamic ) ; }
+
+		for ( j = 0 , jMax = dynamic.entities.length ; j < jMax ; j ++ ) {
+			entity = dynamic.entities[ j ] ;
+			point = line.options.points[ j ] ;
+			point.x = entity.position.x ;
+			point.y = entity.position.y ;
+			point.z = entity.position.z ;
+		}
+		
+		BABYLON.MeshBuilder.CreateLines( 'line' , line.options ) ;
+		line.refreshBoundingInfo();
 	}
 }
 

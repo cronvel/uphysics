@@ -26,7 +26,7 @@ var timeStep = 0.005 ,
 	springK = 10000 , dampingFactor = 200 ,
 	restLength = 1 ,
 	mass = 10 ,
-	subdivide = 2 ,
+	subdivide = new physic.Vector3D( 1 , 1 , 3 ) ,
 	randomDisplacement = 0.1 ;
 
 
@@ -49,6 +49,7 @@ var structureTemplate = new physic.builders.SpringDamperStructure( {
 	size: new physic.Vector3D( 1 , 1 , 2 ) ,
 	//size: new physic.Vector3D( 2 , 2 , 4 ) ,
 	material: basicMaterial ,
+	centerOfMass: new physic.Vector3D( 0 , 0 , 0 ) ,
 	subdivide , springK , dampingFactor , mass , randomDisplacement
 } ) ;
 
